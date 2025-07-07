@@ -6,6 +6,30 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static '/vendor/gridjs/theme/mermaid.min.css' %}">
+<style>
+    /* Custom spacing for Station Table columns */
+    .gridjs-table {
+        table-layout: fixed !important;
+    }
+
+    /* Sl no: 240px */
+    .gridjs-th:nth-child(1),
+    .gridjs-td:nth-child(1) {
+        width: 240px !important;
+    }
+
+    /* Train Name: auto (flexible) */
+    .gridjs-th:nth-child(2),
+    .gridjs-td:nth-child(2) {
+        width: auto !important;
+    }
+
+    /* Train Status: 280px */
+    .gridjs-th:nth-child(3),
+    .gridjs-td:nth-child(3) {
+        width: 280px !important;
+    }
+</style>
 {% endblock extra_css %}
 
 {% block page_title %}
@@ -13,7 +37,6 @@
 {% endblock page_title %}
 
 {% block page_content %}
-
 
 
 <div class="row">
@@ -41,7 +64,7 @@
 
 {% block extra_javascript %}
 <script src="{% static '/vendor/gridjs/gridjs.umd.js' %}"></script>
-<script src="{% static '/js/components/table-gridjs.js' %}"></script>
+<script src="{% static '/js/components/train-grid.js' %}"></script>
 
 <script>
     // date Format: Friday, July 04, 2025
@@ -60,7 +83,5 @@
     const now = new Date();
     dateValueElement.textContent = formatDate(now);
 </script>
-
-
 
 {% endblock extra_javascript %}

@@ -9,21 +9,46 @@ fetch("http://127.0.0.1:5000/trains")
         {
           name: "Train Name",
           width: "auto",
-          formatter: (cell) =>
-            gridjs.html(
-              `<a href="/train-details?name=${encodeURIComponent(
+          formatter: (cell, row) => {
+            const trainId = row.cells[0].data;
+            const trainStatus = row.cells[2].data;
+            return gridjs.html(
+              `<a href="/train-report?name=${encodeURIComponent(
                 cell
-              )}" style="color: #011bff; text-decoration: none;">${cell}</a>`
-            ),
+              )}&status=${trainStatus}&id=${trainId}" style="color: #011bff; text-decoration: none;">${cell}</a>`
+            );
+          },
         },
         {
           name: "Train Status",
           formatter: (cell, row) => {
             const trainName = row.cells[1].data;
-            const trainNameEnco = encodeURIComponent(trainName);
-            const color = cell === "Finished" ? "green" : "red";
+            const trainId = row.cells[0].data;
+            const isFinished = cell === "Finished";
+            const bgColor = isFinished ? "#28a745" : "#dc3545";
+            const hoverColor = isFinished ? "#218838" : "#c82333";
+
             return gridjs.html(
-              `<a href="/train-status?name=${trainNameEnco}" class="status-cell" style="background-color:${color}; color:white; padding:4px 8px; border-radius:4px; cursor:pointer;">${cell}</a>`
+              `<a href="/train-report?name=${encodeURIComponent(
+                trainName
+              )}&status=${cell}&id=${trainId}"
+                 style="background-color: ${bgColor};
+                        color: white;
+                        padding: 6px 12px;
+                        border-radius: 4px;
+                        text-decoration: none;
+                        font-weight: 500;
+                        display: inline-block;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                 onmouseover="this.style.backgroundColor='${hoverColor}';
+                              this.style.transform='translateY(-1px)';
+                              this.style.boxShadow='0 4px 8px rgba(0,0,0,0.2)';"
+                 onmouseout="this.style.backgroundColor='${bgColor}';
+                             this.style.transform='translateY(0px)';
+                             this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)';">
+                ${cell}
+              </a>`
             );
           },
         },
