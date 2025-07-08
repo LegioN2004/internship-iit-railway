@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from datetime import datetime
 import os
@@ -6,28 +6,29 @@ import os
 # Flask app setup
 app = Flask(
     __name__,
-    template_folder='../templates',  # Point to Django templates
-    static_folder='../static'        # Point to Django static files
+    template_folder='../templates',
+    static_folder='../static'
 )
 CORS(app)
 
 trains_data = [
-    {"sl_no": 1, "name": "debojeetor rajdhani express", "status": "Unfinished"},
-    {"sl_no": 2, "name": "debo2 goods Train", "status": "Unfinished"},
-    {"sl_no": 3, "name": "mili goods Train", "status": "Unfinished"},
-    {"sl_no": 4, "name": "goru goods Train", "status": "Finished"},
-    {"sl_no": 5, "name": "manuh goods Train", "status": "Unfinished"},
-    {"sl_no": 6, "name": "sixth goods Train", "status": "Finished"},
-    {"sl_no": 7, "name": "seventh goods Train", "status": "Unfinished"},
-    {"sl_no": 8, "name": "eighth goods Train", "status": "Unfinished"},
-    {"sl_no": 9, "name": "ninth goods Train", "status": "Unfinished"},
-    {"sl_no": 10, "name": "tenth goods Train", "status": "Unfinished"},
-    {"sl_no": 11, "name": "eleventh goods Train", "status": "Finished"},
-    {"sl_no": 12, "name": "twelfth goods Train", "status": "Unfinished"},
-    {"sl_no": 13, "name": "thirteenth goods Train", "status": "Unfinished"},
-    {"sl_no": 14, "name": "fourteenth goods Train", "status": "Finished"},
-    {"sl_no": 15, "name": "fifteenth goods Train", "status": "Unfinished"},
+    {"sl_no": 1, "name": "rajdhani express", "status": "Unfinished", "time": "17:57:00"},
+    {"sl_no": 2, "name": "goods2 Train", "status": "Unfinished", "time": "17:57:00"},
+    {"sl_no": 3, "name": "goods3 Train", "status": "Unfinished", "time": "17:57:00"},
+    {"sl_no": 4, "name": "goods4 Train", "status": "Finished", "time": "17:57:00"},
+    {"sl_no": 5, "name": "manuh goods Train", "status": "Unfinished", "time": "17:57:00"},
+    {"sl_no": 6, "name": "sixth goods Train", "status": "Finished", "time": "17:57:00"},
+    {"sl_no": 7, "name": "seventh goods Train", "status": "Unfinished", "time": "17:57:00"},
+    {"sl_no": 8, "name": "eighth goods Train", "status": "Unfinished", "time": "17:57:00"},
+    {"sl_no": 9, "name": "ninth goods Train", "status": "Unfinished", "time": "17:57:00"},
+    {"sl_no": 10, "name": "tenth goods Train", "status": "Unfinished", "time": "17:57:00"},
+    {"sl_no": 11, "name": "eleventh goods Train", "status": "Finished", "time": "17:57:00"},
+    {"sl_no": 12, "name": "twelfth goods Train", "status": "Unfinished", "time": "17:57:00"},
+    {"sl_no": 13, "name": "thirteenth goods Train", "status": "Unfinished", "time": "17:57:00"},
+    {"sl_no": 14, "name": "fourteenth goods Train", "status": "Finished", "time": "17:57:00"},
+    {"sl_no": 15, "name": "fifteenth goods Train", "status": "Unfinished", "time": "17:57:00"},
 ]
+
 
 @app.route('/trains', methods=['GET'])
 def get_trains():

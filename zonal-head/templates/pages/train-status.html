@@ -1,0 +1,53 @@
+{% extends 'vertical.html' %}
+
+{% load static i18n %}
+
+<!-- {% block title %}Grid Js Tables{% endblock title %} -->
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static '/vendor/gridjs/theme/mermaid.min.css' %}">
+{% endblock extra_css %}
+
+{% block page_title %}
+{% include 'partials/page-title.html' with title="Ground Staff" subtitle="Tables" %}
+{% endblock page_title %}
+
+{% block page_content %}
+
+
+
+<div class="row">
+    <!-- end col -->
+</div>
+
+<!-- end row -->
+
+{% endblock page_content %}
+
+{% block extra_javascript %}
+<script src="{% static '/vendor/gridjs/gridjs.umd.js' %}"></script>
+<script src="{% static '/js/components/table-gridjs.js' %}"></script>
+
+<script>
+    // date Format: Friday, July 04, 2025
+    function formatDate(date) {
+        const options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: '2-digit',
+        };
+        return date.toLocaleString('en-US', options);
+    }
+
+    // Set current date
+    const dateValueElement = document.getElementById('date-value');
+    const now = new Date();
+    dateValueElement.textContent = formatDate(now);
+</script>
+
+
+
+{% endblock extra_javascript %}
+
+{% block sidebar %}{% endblock sidebar %}

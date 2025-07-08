@@ -1,0 +1,72 @@
+[
+  {
+    "Case_ID": 101,
+    "Case_Remark": "Theft reported in coach A3",
+    "SI_No": 11,
+    "Station_Code": "STN001",
+    "Status": "Open"
+  },
+  {
+    "Case_ID": 102,
+    "Case_Remark": "Suspicious activity near platform 2",
+    "SI_No": 12,
+    "Station_Code": "STN002",
+    "Status": "Closed"
+  },
+  {
+    "Case_ID": 103,
+    "Case_Remark": "Lost luggage reported",
+    "SI_No": 13,
+    "Station_Code": "STN003",
+    "Status": "Open"
+  },
+  {
+    "Case_ID": 104,
+    "Case_Remark": "Vandalism in waiting room",
+    "SI_No": 14,
+    "Station_Code": "STN004",
+    "Status": "Open"
+  },
+  {
+    "Case_ID": 105,
+    "Case_Remark": "Unauthorized vendor complaint",
+    "SI_No": 15,
+    "Station_Code": "STN005",
+    "Status": "Closed"
+  },
+  {
+    "Case_ID": 106,
+    "Case_Remark": "Broken CCTV at gate",
+    "SI_No": 16,
+    "Station_Code": "STN006",
+    "Status": "Open"
+  },
+  {
+    "Case_ID": 107,
+    "Case_Remark": "Passenger fight reported",
+    "SI_No": 17,
+    "Station_Code": "STN007",
+    "Status": "Closed"
+  },
+  {
+    "Case_ID": 108,
+    "Case_Remark": "Gate left open",
+    "SI_No": 18,
+    "Station_Code": "STN008",
+    "Status": "Open"
+  },
+  {
+    "Case_ID": 109,
+    "Case_Remark": "Lighting issue on platform 3",
+    "SI_No": 19,
+    "Station_Code": "STN009",
+    "Status": "Closed"
+  },
+  {
+    "Case_ID": 110,
+    "Case_Remark": "Fire alarm triggered falsely",
+    "SI_No": 20,
+    "Station_Code": "STN010",
+    "Status": "Open"
+  }
+]

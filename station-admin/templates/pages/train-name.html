@@ -1,0 +1,40 @@
+{% extends 'vertical.html' %}
+
+{% load static i18n %}
+
+{% block title %}Train Details{% endblock title %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static '/vendor/gridjs/theme/mermaid.min.css' %}">
+{% endblock extra_css %}
+
+{% block page_title %}
+{% include 'partials/page-title.html' with title="Ground Staff" subtitle="Tables" %}
+{% endblock page_title %}
+
+{% block page_content %}
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            hello world
+        </div><!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+
+{% endblock page_content %}
+
+
+{ $ block extra_javascript $}
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const trainName = params.get("name");
+
+    // You can now use trainName to show data
+    document.getElementById("train-name").textContent = decodeURIComponent(trainName);
+</script>
+
+{ $ endblock extra_javascript $}

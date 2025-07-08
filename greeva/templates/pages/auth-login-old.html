@@ -1,0 +1,293 @@
+{% extends 'base.html' %}
+
+{% load static i18n %}
+
+{% block title %}Log In{% endblock title %}
+
+{% block content %}
+
+<div class="auth-bg d-flex min-vh-100 justify-content-center align-items-center">
+    <div class="row g-0 justify-content-center w-100 m-xxl-5 px-xxl-4 m-3">
+        <div class="col-xl-4 col-lg-5 col-md-6">
+            <div class="card overflow-hidden text-center h-100 p-xxl-4 p-3 mb-0">
+                <a href="/" class="auth-brand mb-3">
+                    <img src="{% static '/images/IITG_logo_dark.png' %}" alt="dark logo" height="39" class="logo-dark">
+                    <img src="{% static '/images/IITG_logo_white.png' %}" alt="logo light" height="39"
+                        class="logo-light">
+                    <h1 class="text-right fs-3 font-weight-normal">IIT Guwahati</h1>
+                </a>
+
+                <h4 class="fw-semibold mb-2 fs-18">Log in to your account</h4>
+
+
+                <form action="/" class="text-start mb-3" id="loginForm" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label" for="phone-number">Phone Number</label>
+                        <input type="tel" id="phone-number" name="phone-number" class="form-control"
+                            placeholder="Enter your phone number" pattern="[0-9]{10}" maxlength="10" required>
+                        <div class="invalid-feedback" id="phone-error">
+                            Please enter a valid 10-digit phone number.
+                        </div>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="password">Password</label>
+                        <div class="position-relative">
+                            <input type="password" id="password" name="password" class="form-control"
+                                placeholder="Enter your password" minlength="6" required>
+                            <button type="button"
+                                class="btn btn-link position-absolute end-0 top-50 translate-middle-y p-0 me-3"
+                                id="togglePassword" style="border: none; background: none;">
+                                <i class="ti ti-eye" id="eyeIcon"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback" id="password-error">
+                            Password must be at least 6 characters long.
+                        </div>
+                        <div class="valid-feedback">
+                            Password is valid!
+                        </div>
+                        <small class="text-muted">Minimum 6 characters required</small>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="checkbox-signin">
+                            <label class="form-check-label" for="checkbox-signin">Remember me</label>
+                        </div>
+
+                        <a href="{% url 'pages:dynamic_pages' template_name='auth-recoverpw' %}"
+                            class="text-muted border-bottom border-dashed">Forgot
+                            Password</a>
+                    </div>
+
+                    <div class="d-grid">
+                        <button class="btn btn-primary fw-semibold" type="submit" id="submitBtn">Login</button>
+                    </div>
+                </form>
+
+                <p class="text-muted fs-14 mb-4">Don't have an account? <a
+                        href="{% url 'pages:dynamic_pages' template_name='auth-register' %}"
+                        class="fw-semibold text-danger ms-1">Sign Up !</a></p>
+
+                <p class="mt-auto mb-0">
+                    <script>document.write(new Date().getFullYear())</script> © IITG - By <span
+                        class="fw-bold text-decoration-underline text-uppercase text-reset fs-14">IITG</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('loginForm');
+        const phoneInput = document.getElementById('phone-number');
+        const passwordInput = document.getElementById('password');
+        const togglePassword = document.getElementById('togglePassword');
+        const eyeIcon = document.getElementById('eyeIcon');
+        const submitBtn = document.getElementById('submitBtn');
+
+        let phoneValidationTimeout;
+        let passwordValidationTimeout;
+
+        // Phone number input - only clean the input, no validation UI
+        phoneInput.addEventListener('input', function () {
+            const phoneValue = this.value.replace(/\D/g, ''); // Remove non-digits
+            this.value = phoneValue; // Set cleaned value
+
+            // Clear any existing validation classes while typing
+            this.classList.remove('is-valid', 'is-invalid');
+
+            // Clear existing timeout
+            clearTimeout(phoneValidationTimeout);
+
+            // Set a delay for validation to show after user stops typing
+            phoneValidationTimeout = setTimeout(() => {
+                validatePhoneNumber();
+            }, 800); // 800ms delay
+        });
+
+        // Phone number blur - validate when user leaves the field
+        phoneInput.addEventListener('blur', function () {
+            clearTimeout(phoneValidationTimeout);
+            validatePhoneNumber();
+        });
+
+        function validatePhoneNumber() {
+            const phoneValue = phoneInput.value.replace(/\D/g, '');
+
+            if (phoneValue.length === 0) {
+                // No input, remove all validation classes
+                phoneInput.classList.remove('is-valid', 'is-invalid');
+            } else if (phoneValue.length === 10) {
+                // Valid input
+                phoneInput.classList.remove('is-invalid');
+                phoneInput.classList.add('is-valid');
+            } else {
+                // Invalid input
+                phoneInput.classList.remove('is-valid');
+                phoneInput.classList.add('is-invalid');
+            }
+        }
+
+        // Password input - with delay
+        passwordInput.addEventListener('input', function () {
+            // Clear any existing validation classes while typing
+            this.classList.remove('is-valid', 'is-invalid');
+
+            // Clear existing timeout
+            clearTimeout(passwordValidationTimeout);
+
+            // Set a delay for validation to show after user stops typing
+            passwordValidationTimeout = setTimeout(() => {
+                validatePassword();
+            }, 600); // 600ms delay
+        });
+
+        // Password blur - validate when user leaves the field
+        passwordInput.addEventListener('blur', function () {
+            clearTimeout(passwordValidationTimeout);
+            validatePassword();
+        });
+
+        function validatePassword() {
+            const passwordValue = passwordInput.value;
+
+            if (passwordValue.length === 0) {
+                // No input, remove all validation classes
+                passwordInput.classList.remove('is-valid', 'is-invalid');
+            } else if (passwordValue.length >= 6) {
+                // Valid input
+                passwordInput.classList.remove('is-invalid');
+                passwordInput.classList.add('is-valid');
+            } else {
+                // Invalid input
+                passwordInput.classList.remove('is-valid');
+                passwordInput.classList.add('is-invalid');
+            }
+        }
+
+        // Toggle password visibility
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            if (type === 'text') {
+                eyeIcon.className = 'ti ti-eye-off';
+            } else {
+                eyeIcon.className = 'ti ti-eye';
+            }
+        });
+
+        // Form submission validation
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Clear any pending timeouts
+            clearTimeout(phoneValidationTimeout);
+            clearTimeout(passwordValidationTimeout);
+
+            let isValid = true;
+
+            // Validate phone number
+            const phoneValue = phoneInput.value.replace(/\D/g, '');
+            if (phoneValue.length !== 10) {
+                phoneInput.classList.add('is-invalid');
+                phoneInput.classList.remove('is-valid');
+                isValid = false;
+            } else {
+                phoneInput.classList.add('is-valid');
+                phoneInput.classList.remove('is-invalid');
+            }
+
+            // Validate password
+            if (passwordInput.value.length < 6) {
+                passwordInput.classList.add('is-invalid');
+                passwordInput.classList.remove('is-valid');
+                isValid = false;
+            } else {
+                passwordInput.classList.add('is-valid');
+                passwordInput.classList.remove('is-invalid');
+            }
+
+            if (isValid) {
+                // Show loading state
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Logging in...';
+                submitBtn.disabled = true;
+
+                // Simulate form submission (replace with actual submission logic)
+                setTimeout(() => {
+                    // Reset button state
+                    submitBtn.innerHTML = 'Login';
+                    submitBtn.disabled = false;
+
+                    // Here you would normally submit the form or make an API call
+                    alert('Form validation passed! Ready to submit.');
+                }, 2000);
+            } else {
+                // Shake effect for invalid form
+                form.classList.add('shake');
+                setTimeout(() => form.classList.remove('shake'), 500);
+            }
+        });
+    });
+</script>
+
+<style>
+    .shake {
+        animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+
+        0%,
+        20%,
+        40%,
+        60%,
+        80% {
+            transform: translateX(-5px);
+        }
+
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+            transform: translateX(5px);
+        }
+    }
+
+    .position-relative .btn-link {
+        z-index: 5;
+    }
+
+    .btn-link:focus {
+        box-shadow: none;
+    }
+
+    .invalid-feedback {
+        display: block;
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 3.6.4.4.4-.4'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+
+    .form-control.is-valid {
+        border-color: #28a745;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='m2.3 6.73.7-.7 1.4-1.4.7-.7-.7-.7L2.9 3 2.3 3.7l-.7.7 1.4 1.4z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+</style>
+
+{% endblock content %}

@@ -1,0 +1,80 @@
+{% load static i18n %}
+<!-- Sidenav Menu Start -->
+<div class="sidenav-menu">
+
+    <!-- Brand Logo -->
+    <a href="{% url 'pages:dynamic_pages' template_name='index' %}" class="logo">
+        <span class="logo-light">
+            <span class="logo-lg d-flex align-items-center justify-content-center w-100">
+                <img src="../../static/images/IITG_logo_dark.png" alt="logo" style="width: 30px; height: 30px;">
+                <h1 class="fs-5 ms-2 text-white mb-0">IITG</h1>
+            </span>
+            <span class="logo-sm d-flex align-items-center justify-content-center w-100">
+                <img src="../../static/images/IITG_logo_light.png" alt="small logo" style="width: 30px; height: 30px;">
+            </span>
+        </span>
+
+        <span class="logo-dark">
+            <span class="logo-lg d-flex align-items-center justify-content-center w-100">
+                <img src="../../static/images/IITG_logo_dark.png" alt="logo" style="width: 30px; height: 30px;">
+                <h1 class="fs-5 ms-2 text-dark mb-0">IITG</h1>
+            </span>
+            <span class="logo-sm d-flex align-items-center justify-content-center w-100">
+                <img src="../../static/images/IITG_logo_dark.png" alt="small logo" style="width: 30px; height: 30px;">
+            </span>
+        </span>
+    </a>
+
+    <!-- Sidebar Hover Menu Toggle Button -->
+    <button class="button-sm-hover">
+        <i class="ti ti-circle align-middle"></i>
+    </button>
+
+    <!-- Full Sidebar Menu Close Button -->
+    <button class="button-close-fullsidebar">
+        <i class="ti ti-x align-middle"></i>
+    </button>
+
+    <div data-simplebar>
+
+        <!--- Sidenav Menu -->
+        <ul class="side-nav">
+            <!-- <li class="side-nav-title">Navigation</li> -->
+
+            <li class="side-nav-item">
+                <a href="{% url 'pages:dynamic_pages' template_name='index' %}" class="side-nav-link">
+                    <span class="menu-icon"><i class="ti ti-dashboard"></i></span>
+                    <span class="menu-text"> Dashboard </span>
+                    <span class="badge bg-success rounded-pill">5</span>
+                </a>
+            </li>
+
+            <li class="side-nav-item">
+                <a href="{% url 'pages:dynamic_pages' template_name='apps-calendar' %}" class="side-nav-link">
+                    <span class="menu-icon"><i class="ti ti-calendar"></i></span>
+                    <span class="menu-text"> Calendar </span>
+                </a>
+            </li>
+
+
+            <li class="side-nav-item">
+                <a href="{% url 'pages:dynamic_pages' template_name='tables-gridjs' %}" aria-expanded="false"
+                    aria-controls="sidebarTables" class="side-nav-link">
+                    <span class="menu-icon"><i class="ti ti-table"></i></span>
+                    <span class="menu-text">Station Table</span>
+                </a>
+            </li>
+
+            <li class="side-nav-item">
+                <a href="{% url 'pages:dynamic_pages' template_name='tables-datatable' %}" aria-expanded="false"
+                    aria-controls="sidebarTables" class="side-nav-link">
+                    <span class="menu-icon"><i class="ti ti-table"></i></span>
+                    <span class="menu-text">Database table</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="clearfix"></div>
+    </div>
+</div>
+<!-- Sidenav Menu End -->

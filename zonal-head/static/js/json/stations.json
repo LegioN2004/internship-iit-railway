@@ -1,0 +1,52 @@
+[
+  {
+    "SI_No": 1,
+    "Station_Code": "STN001",
+    "Station_Name": "Kolkata Junction"
+  },
+  {
+    "SI_No": 2,
+    "Station_Code": "STN002",
+    "Station_Name": "Delhi Central"
+  },
+  {
+    "SI_No": 3,
+    "Station_Code": "STN003",
+    "Station_Name": "Mumbai Gateway"
+  },
+  {
+    "SI_No": 4,
+    "Station_Code": "STN004",
+    "Station_Name": "Chennai Park"
+  },
+  {
+    "SI_No": 5,
+    "Station_Code": "STN005",
+    "Station_Name": "Guwahati Town"
+  },
+  {
+    "SI_No": 6,
+    "Station_Code": "STN006",
+    "Station_Name": "Bangalore East"
+  },
+  {
+    "SI_No": 7,
+    "Station_Code": "STN007",
+    "Station_Name": "Hyderabad City"
+  },
+  {
+    "SI_No": 8,
+    "Station_Code": "STN008",
+    "Station_Name": "Pune Terminal"
+  },
+  {
+    "SI_No": 9,
+    "Station_Code": "STN009",
+    "Station_Name": "Jaipur Metro"
+  },
+  {
+    "SI_No": 10,
+    "Station_Code": "STN010",
+    "Station_Name": "Ahmedabad Line"
+  }
+]
