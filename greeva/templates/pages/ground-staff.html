@@ -6,36 +6,6 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static '/vendor/gridjs/theme/mermaid.min.css' %}">
-<style>
-    /* Custom spacing for Station Table columns */
-    .gridjs-table {
-        table-layout: fixed !important;
-    }
-
-    /* Sl no: 240px */
-    .gridjs-th:nth-child(1),
-    .gridjs-td:nth-child(1) {
-        width: 240px !important;
-    }
-
-    /* Train Name: auto (flexible) */
-    .gridjs-th:nth-child(2),
-    .gridjs-td:nth-child(2) {
-        width: auto !important;
-    }
-
-    /* Train Status: 280px */
-    .gridjs-th:nth-child(3),
-    .gridjs-td:nth-child(3) {
-        width: 280px !important;
-    }
-
-    /* Train Status: 280px */
-    .gridjs-th:nth-child(4),
-    .gridjs-td:nth-child(4) {
-        width: 280px !important;
-    }
-</style>
 {% endblock extra_css %}
 
 {% block page_title %}
@@ -70,9 +40,25 @@
 
 {% block extra_javascript %}
 <script src="{% static '/vendor/gridjs/gridjs.umd.js' %}"></script>
+<script src="{% static '/js/utils/jwt-auth.js' %}"></script>
 <script src="{% static '/js/components/ground-staff-logic.js' %}"></script>
 
 <script>
+    // Debug authentication state
+    console.log("Ground-staff page loaded");
+    console.log("Token in localStorage:", localStorage.getItem("authToken"));
+    console.log("JWT_AUTH.isAuthenticated():", JWT_AUTH.isAuthenticated());
+
+    // Protect this page - redirect to login if not authenticated
+    const loginUrl = "{% url 'pages:dashboard' %}";
+    if (!JWT_AUTH.isAuthenticated()) {
+        console.log("Not authenticated, redirecting to login");
+        window.location.href = loginUrl;
+        return;
+    }
+
+    console.log("User is authenticated, proceeding with page load");
+
     // date Format: Friday, July 04, 2025
     function formatDate(date) {
         const options = {

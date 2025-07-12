@@ -6,19 +6,17 @@ import jwt
 from datetime import datetime, timedelta
 from functools import wraps
 import re
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 
 # ------------------- APP CONFIG -------------------
 
 app = Flask(__name__)
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:sumuchamp@localhost/train2'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost/train2'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'your_super_secret_key_here'  # Replace with a strong random key in production
+app.config['SECRET_KEY'] = 'greeva-train-jwt-secret-key-2024-production-secure-12345'  # Strong secret key for JWT
 
 db = SQLAlchemy(app)
-jwt = JWTManager(app)
 
 # ------------------- UTILITIES -------------------
 
@@ -145,13 +143,20 @@ def create_signup():
         db.session.add(new_user)
         db.session.commit()
 
-        access_token = create_access_token(identity=new_user.SI_No)
+        # Use consistent JWT token generation (same as login)
+        token = jwt.encode({
+            'user_id': new_user.SI_No,
+            'exp': datetime.utcnow() + timedelta(hours=2)
+        }, app.config['SECRET_KEY'], algorithm="HS256")
+
+        if isinstance(token, bytes):
+            token = token.decode('utf-8')
 
         return jsonify({
             'success': True,
             'message': 'User created successfully',
             'user': new_user.to_dict(),
-            'access_token': access_token
+            'access_token': token
         }), 201
 
     except Exception as e:
@@ -172,7 +177,7 @@ def login():
         try:
             token = jwt.encode({
                 'user_id': user.SI_No,
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=2)
+                'exp': datetime.utcnow() + timedelta(hours=2)
             }, app.config['SECRET_KEY'], algorithm="HS256")
 
             if isinstance(token, bytes):
@@ -181,7 +186,7 @@ def login():
             return jsonify({
                 "status": "success",
                 "message": f"Welcome {user.Name}!",
-                "token": token,
+                "access_token": token,
                 "user": user.to_dict()
             }), 200
         except Exception as e:
@@ -191,6 +196,49 @@ def login():
         "status": "error",
         "message": "Invalid phone number or password"
     }), 401
+
+
+# ------------------- TRAIN DATA (PROTECTED) -------------------
+
+
+# Define Goodstrain model for fetching train data
+class Goodstrain(db.Model):
+    __tablename__ = 'goodstrains'
+    Sl_No = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    Train_Name = db.Column(db.String(50))
+    Train_Status = db.Column(db.String(20))
+
+    def to_dict(self):
+        return {
+            'sl_no': self.Sl_No,
+            'name': self.Train_Name,
+            'status': self.Train_Status
+        }
+
+@app.route('/trains', methods=['GET'])
+@token_required
+def get_trains(current_user):
+    # Fetch train data from the goodstrain table
+    trains = Goodstrain.query.all()
+    # Get current time in HH:MM AM/PM format
+    now = datetime.now().strftime('%I:%M %p')
+    train_list = []
+    for train in trains:
+        train_dict = train.to_dict()
+        train_dict['time'] = now  # Always use current time
+        train_list.append(train_dict)
+
+    # Get the user's station name
+    station_name = None
+    if current_user.Station_Code:
+        station = Station.query.filter_by(Station_Code=current_user.Station_Code).first()
+        if station:
+            station_name = station.Station_Name
+
+    return jsonify({
+        'trains': train_list,
+        'station_name': station_name
+    }), 200
 
 # ------------------- PROFILE (PROTECTED) -------------------
 

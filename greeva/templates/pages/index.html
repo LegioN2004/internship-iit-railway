@@ -1,901 +1,429 @@
-{% extends 'vertical.html' %}
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block title %}Log In{% endblock title %}
+{% block content %}
 
-{% load static %}
+<div class="auth-bg d-flex min-vh-100 justify-content-center align-items-center">
+    <div class="row g-0 justify-content-center w-100 m-xxl-5 px-xxl-4 m-3">
+        <div class="col-xl-4 col-lg-5 col-md-6">
+            <div class="card overflow-hidden text-center h-100 p-xxl-4 p-3 mb-0">
+                <a href="/" class="auth-brand mb-4 text-decoration-none">
+                    <img src="{% static '/images/IITG_logo_dark.png' %}" alt="dark logo" class="logo-dark">
+                    <h2>IIT Guwahati</h2>
+                </a>
 
-{% block title %}Dashboard{% endblock title %}
+                <h4 class="fw-semibold mb-2 fs-18">Log in to your account</h4>
 
-{% block extra_css %}
-<link href="{% static '/vendor/jsvectormap/jsvectormap.min.css' %}" rel="stylesheet" type="text/css">
-{% endblock extra_css %}
-
-{% block page_title %}
-{% include 'partials/page-title.html' with title="Dashboard" %}
-{% endblock page_title %}
-
-{% block page_content %}
-
-<div class="row row-cols-xxl-4 row-cols-md-2 row-cols-1">
-    <div class="col">
-        <div class="card overflow-hidden">
-            <div class="card-body">
-                <h5 class="text-muted fs-13 text-uppercase" title="Number of Orders">Total Orders</h5>
-                <div class="d-flex align-items-center gap-2 my-2 py-1">
-                    <div class="user-img fs-42 flex-shrink-0">
-                        <span class="avatar-title text-bg-primary rounded-circle fs-22">
-                            <iconify-icon icon="solar:case-round-minimalistic-bold-duotone"></iconify-icon>
-                        </span>
+                <form class="text-start mb-3" id="loginForm" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label" for="phone-number">Phone Number</label>
+                        <input type="tel" id="phone-number" name="phone-number" class="form-control"
+                            placeholder="Enter your phone number" maxlength="10" required />
+                        <div class="invalid-feedback" id="phone-error">
+                            Please enter a valid 10-digit phone number.
+                        </div>
+                        <div class="valid-feedback">
+                            Phone number is correct!
+                        </div>
                     </div>
-                    <h3 class="mb-0 fw-bold">687.3k</h3>
-                    <iconify-icon icon="solar:cart-2-line-duotone"
-                        class="ms-auto display-1 position-absolute opacity-25 text-muted widget-icon"></iconify-icon>
-                </div>
-                <p class="mb-0 text-muted">
-                    <span class="text-danger me-2"><i class="ti ti-caret-down-filled"></i> 9.19%</span>
-                    <span class="text-nowrap">Since last month</span>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="password">Password</label>
+                        <div class="position-relative">
+                            <input type="password" id="password" name="password" class="form-control"
+                                placeholder="Enter your password" required />
+                            <button type="button"
+                                class="btn btn-link position-absolute end-0 top-50 translate-middle-y p-0 me-3"
+                                id="togglePassword" style="border: none; background: none">
+                                <i class="ti ti-eye" id="eyeIcon"></i>
+                            </button>
+                        </div>
+                        <div class="alert alert-warning mt-2 py-2 px-3" id="password-warning"
+                            style="display: none; font-size: 0.8rem;">
+                            <i class="ti ti-alert-triangle me-1"></i>
+                            Password must be at least 8 characters, contain 1 uppercase, 1 lowercase, 1 number, and 1
+                            special character.
+                        </div>
+                        <div class="valid-feedback" id="password-ok" style="display: none;">
+                            <i class="ti ti-circle-check me-1"></i> Password is okay!
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="checkbox-signin" />
+                            <label class="form-check-label" for="checkbox-signin">Remember me</label>
+                        </div>
+                        <a href="{% url 'pages:dynamic_pages' template_name='auth-recoverpw' %}"
+                            class="text-muted border-bottom border-dashed">Forgot Password</a>
+                    </div>
+
+                    <div class="d-grid">
+                        <button class="btn btn-primary fw-semibold" type="submit" id="submitBtn">
+                            Login
+                        </button>
+                    </div>
+                </form>
+
+                <div id="response" class="text-danger fw-semibold mt-3"></div>
+
+                <p class="text-muted fs-14 mb-4">
+                    Don't have an account?
+                    <a href="{% url 'pages:dynamic_pages' template_name='auth-signup' %}"
+                        class="fw-semibold text-danger ms-1">Sign Up!</a>
+                </p>
+
+                <p class="mt-auto mb-0">
+                    <script>
+                        document.write(new Date().getFullYear());
+                    </script>
+                    © IITG
                 </p>
             </div>
         </div>
-    </div><!-- end col -->
+    </div>
+</div>
 
-    <div class="col">
-        <div class="card overflow-hidden">
-            <div class="card-body">
-                <h5 class="text-muted fs-13 text-uppercase" title="Number of Orders">Total Returns</h5>
-                <div class="d-flex align-items-center gap-2 my-2 py-1">
-                    <div class="user-img fs-42 flex-shrink-0">
-                        <span class="avatar-title text-bg-primary rounded-circle fs-22">
-                            <iconify-icon icon="solar:bill-list-bold-duotone"></iconify-icon>
-                        </span>
-                    </div>
-                    <h3 class="mb-0 fw-bold">9.62k</h3>
-                    <iconify-icon icon="solar:banknote-2-line-duotone"
-                        class="ms-auto display-1 position-absolute opacity-25 text-muted widget-icon"></iconify-icon>
-                </div>
-                <p class="mb-0 text-muted">
-                    <span class="text-success me-2"><i class="ti ti-caret-up-filled"></i> 26.87%</span>
-                    <span class="text-nowrap">Since last month</span>
-                </p>
-            </div>
-        </div>
-    </div><!-- end col -->
+<script src="{% static '/js/utils/jwt-auth.js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Check if user is already logged in, redirect to ground-staff
+        if (JWT_AUTH.isAuthenticated()) {
+            window.location.href = "{% url 'pages:dynamic_pages' template_name='ground-staff' %}";
+            return;
+        }
 
-    <div class="col">
-        <div class="card overflow-hidden">
-            <div class="card-body">
-                <h5 class="text-muted fs-13 text-uppercase" title="Number of Orders">Avg. Sales Earnings
-                </h5>
-                <div class="d-flex align-items-center gap-2 my-2 py-1">
-                    <div class="user-img fs-42 flex-shrink-0">
-                        <span class="avatar-title text-bg-primary rounded-circle fs-22">
-                            <iconify-icon icon="solar:wallet-money-bold-duotone"></iconify-icon>
-                        </span>
-                    </div>
-                    <h3 class="mb-0 fw-bold">$98.24 <small class="text-muted">USD</small></h3>
-                    <iconify-icon icon="solar:cardholder-line-duotone"
-                        class="ms-auto display-1 position-absolute opacity-25 text-muted widget-icon"></iconify-icon>
-                </div>
-                <p class="mb-0 text-muted">
-                    <span class="text-success me-2"><i class="ti ti-caret-up-filled"></i> 3.51%</span>
-                    <span class="text-nowrap">Since last month</span>
-                </p>
-            </div>
-        </div>
-    </div><!-- end col -->
+        const form = document.getElementById("loginForm");
+        const phoneInput = document.getElementById("phone-number");
+        const passwordInput = document.getElementById("password");
+        const responseDiv = document.getElementById("response");
+        const submitBtn = document.getElementById("submitBtn");
+        const togglePassword = document.getElementById("togglePassword");
+        const eyeIcon = document.getElementById("eyeIcon");
 
-    <div class="col">
-        <div class="card overflow-hidden">
-            <div class="card-body">
-                <h5 class="text-muted fs-13 text-uppercase" title="Number of Orders">Number of Visits
-                </h5>
-                <div class="d-flex align-items-center gap-2 my-2 py-1">
-                    <div class="user-img fs-42 flex-shrink-0">
-                        <span class="avatar-title text-bg-primary rounded-circle fs-22">
-                            <iconify-icon icon="solar:eye-bold-duotone"></iconify-icon>
-                        </span>
-                    </div>
-                    <h3 class="mb-0 fw-bold">87.94M</h3>
-                    <iconify-icon icon="solar:eye-scan-bold-duotone"
-                        class="ms-auto display-1 position-absolute opacity-25 text-muted widget-icon"></iconify-icon>
-                </div>
-                <p class="mb-0 text-muted">
-                    <span class="text-danger me-2"><i class="ti ti-caret-down-filled"></i> 1.05%</span>
-                    <span class="text-nowrap">Since last month</span>
-                </p>
-            </div>
-        </div>
-    </div><!-- end col -->
-</div><!-- end row -->
+        let phoneValidationTimeout;
+        let passwordValidationTimeout;
 
-<div class="row">
-    <div class="col-xl-4">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h4 class="header-title mb-1">Daily Sales</h4>
-                        <p class="text-muted">March 26 - April 01</p>
-                    </div>
-                    <div class="dropdown">
-                        <a href="#" class="dropdown-toggle drop-arrow-none card-drop" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            <i class="ti ti-dots-vertical"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item">Sales Report</a>
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item">Export Report</a>
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item">Profit</a>
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item">Action</a>
-                        </div>
-                    </div>
-                </div>
+        // Toggle password visibility
+        togglePassword.addEventListener("click", function () {
+            const type = passwordInput.type === "password" ? "text" : "password";
+            passwordInput.type = type;
+            eyeIcon.className = type === "text" ? "ti ti-eye-off" : "ti ti-eye";
+        });
 
-                <div class="my-2 d-flex align-items-center justify-content-between">
-                    <h2 class="fw-normal">$8,459.56</h2>
-                    <div class="">
-                        <img src="{% static '/images/cards/american-express.svg' %}" alt="user-card" height="36" />
-                        <img src="{% static '/images/cards/discover-card.svg' %}" alt="user-card" height="36" />
-                        <img src="{% static '/images/cards/mastercard.svg' %}" alt="user-card" height="36" />
-                    </div>
-                </div>
+        // Phone number input validation
+        phoneInput.addEventListener('input', function () {
+            // Remove non-digits and limit to 10 characters
+            const phoneValue = this.value.replace(/\D/g, '').substring(0, 10);
+            this.value = phoneValue;
 
-                <div dir="ltr">
-                    <div id="daily-sales" class="apex-charts" data-colors="#6ac75a,#188ae2"></div>
-                </div>
+            // Clear validation classes while typing
+            this.classList.remove('is-valid', 'is-invalid');
 
-            </div>
-        </div> <!-- end card-->
-    </div> <!-- end col-->
+            // Clear existing timeout
+            clearTimeout(phoneValidationTimeout);
 
-    <div class="col-xl-4">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h4 class="header-title mb-1">Statistics</h4>
-                    </div>
-                    <div class="dropdown">
-                        <a href="#" class="dropdown-toggle drop-arrow-none card-drop" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            <i class="ti ti-dots-vertical"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item">Sales Report</a>
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item">Export Report</a>
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item">Profit</a>
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item">Action</a>
-                        </div>
-                    </div>
-                </div>
+            // Set 800ms delay for validation
+            phoneValidationTimeout = setTimeout(() => {
+                validatePhoneNumber();
+            }, 800);
+        });
 
-                <div class="row text-center">
-                    <div class="col-sm-4 mt-3">
-                        <h3 class="fw-normal">4,335</h3>
-                        <p class="text-muted text-overflow">Total Sales</p>
-                    </div>
-                    <div class="col-sm-4 mt-3">
-                        <h3 class="fw-normal">874</h3>
-                        <p class="text-muted text-overflow">Open Compaign</p>
-                    </div>
-                    <div class="col-sm-4 mt-3">
-                        <h3 class="fw-normal">2,548</h3>
-                        <p class="text-muted text-overflow">Total Sales</p>
-                    </div>
-                </div>
+        // Phone number blur validation
+        phoneInput.addEventListener('blur', function () {
+            clearTimeout(phoneValidationTimeout);
+            validatePhoneNumber();
+        });
 
-                <div dir="ltr">
-                    <div id="statistics-chart" class="apex-charts" data-colors="#6b5eae,#fbcc5c"></div>
-                </div>
+        function validatePhoneNumber() {
+            const phoneValue = phoneInput.value.replace(/\D/g, '');
 
-            </div>
-        </div> <!-- end card-->
-    </div> <!-- end col-->
+            if (phoneValue.length === 0) {
+                phoneInput.classList.remove('is-valid', 'is-invalid');
+            } else if (phoneValue.length === 10) {
+                phoneInput.classList.remove('is-invalid');
+                phoneInput.classList.add('is-valid');
+            } else {
+                phoneInput.classList.remove('is-valid');
+                phoneInput.classList.add('is-invalid');
+            }
+        }
 
-    <div class="col-xl-4">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h4 class="header-title mb-1">Total Revenue</h4>
-                        <p class="text-muted">March 26 - April 01</p>
-                    </div>
-                    <div class="dropdown">
-                        <a href="#" class="dropdown-toggle drop-arrow-none card-drop" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            <i class="ti ti-dots-vertical"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item">Sales Report</a>
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item">Export Report</a>
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item">Profit</a>
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item">Action</a>
-                        </div>
-                    </div>
-                </div>
+        // Password input validation
+        passwordInput.addEventListener('input', function () {
+            // Clear validation classes while typing
+            this.classList.remove('is-valid', 'is-invalid');
 
-                <div class="my-2 d-flex align-items-center justify-content-between">
-                    <h2 class="fw-normal">$96.56k</h2>
-                    <div class="">
-                        <img src="{% static '/images/cards/american-express.svg' %}" alt="user-card" height="36" />
-                        <img src="{% static '/images/cards/discover-card.svg' %}" alt="user-card" height="36" />
-                        <img src="{% static '/images/cards/mastercard.svg' %}" alt="user-card" height="36" />
-                    </div>
-                </div>
+            // Clear existing timeout
+            clearTimeout(passwordValidationTimeout);
 
-                <div dir="ltr">
-                    <div id="revenue-chart" class="apex-charts" data-colors="#31ce77,#188ae2"></div>
-                </div>
+            // Set delay for validation
+            passwordValidationTimeout = setTimeout(() => {
+                validatePassword();
+            }, 300);
+        });
 
-            </div>
-        </div> <!-- end card-->
-    </div> <!-- end col-->
-</div> <!-- end row-->
+        // Password blur validation
+        passwordInput.addEventListener('blur', function () {
+            clearTimeout(passwordValidationTimeout);
+            validatePassword();
+        });
+
+        function validatePassword() {
+            const password = passwordInput.value;
+            const passwordWarning = document.getElementById('password-warning');
+            const passwordOk = document.getElementById('password-ok');
+
+            // Password requirements
+            const hasLength = password.length >= 8;
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasLowercase = /[a-z]/.test(password);
+            const hasNumber = /\d/.test(password);
+            const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+            const isValid = hasLength && hasUppercase && hasLowercase && hasNumber && hasSpecial;
 
 
-<div class="row">
-    <div class="col-xxl-6">
-        <div class="card">
-            <div class="d-flex card-header justify-content-between align-items-center">
-                <h4 class="header-title">Brands Listing</h4>
-                <a href="javascript:void(0);" class="btn btn-sm btn-light">Add Brand <i class="ti ti-plus ms-1"></i></a>
-            </div>
-            <div class="card-body p-0">
-                <div class="bg-light bg-opacity-50 py-1 text-center">
-                    <p class="m-0"><b>69</b> Active brands out of <span class="fw-medium">102</span></p>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-custom table-centered table-sm table-nowrap table-hover mb-0">
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-md flex-shrink-0 me-2">
-                                            <span class="avatar-title bg-primary-subtle rounded-circle">
-                                                <img src="{% static '/images/products/logo/logo-1.svg' %}" alt=""
-                                                    height="22">
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span class="text-muted fs-12">Electronics</span> <br />
-                                            <h5 class="fs-14 mt-1">ElectroMart - USA</h5>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Established</span>
-                                    <h5 class="fs-14 mt-1 fw-normal">Since 2015</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Stores</span> <br />
-                                    <h5 class="fs-14 mt-1 fw-normal">300</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Products</span>
-                                    <h5 class="fs-14 mt-1 fw-normal">5,200</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Status</span>
-                                    <h5 class="fs-14 mt-1 fw-normal"><i
-                                            class="ti ti-circle-filled fs-12 text-success"></i> Active
-                                    </h5>
-                                </td>
-                            </tr>
+            if (password.length === 0) {
+                passwordInput.classList.remove('is-valid', 'is-invalid');
+                passwordWarning.style.display = 'none';
+                passwordOk.style.display = 'none';
+                return;
+            }
+            if (isValid) {
+                passwordInput.classList.remove('is-invalid');
+                passwordInput.classList.add('is-valid');
+                passwordWarning.style.display = 'none';
+                passwordOk.style.display = 'block';
+            } else {
+                passwordInput.classList.remove('is-valid');
+                passwordInput.classList.add('is-invalid');
+                passwordWarning.style.display = 'block';
+                passwordOk.style.display = 'none';
+            }
+        }
 
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-md flex-shrink-0 me-2">
-                                            <span class="avatar-title bg-info-subtle rounded-circle">
-                                                <img src="{% static '/images/products/logo/logo-2.svg' %}" alt=""
-                                                    height="22">
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span class="text-muted fs-12">Furniture</span> <br />
-                                            <h5 class="fs-14 mt-1">FurniStyle - UK</h5>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Established</span>
-                                    <h5 class="fs-14 mt-1 fw-normal">Since 2010</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Stores</span> <br />
-                                    <h5 class="fs-14 mt-1 fw-normal">120</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Products</span>
-                                    <h5 class="fs-14 mt-1 fw-normal">1,100</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Status</span>
-                                    <h5 class="fs-14 mt-1 fw-normal"><i
-                                            class="ti ti-circle-filled fs-12 text-success"></i> Active
-                                    </h5>
-                                </td>
-                            </tr>
+        function resetRequirementIndicators() {
+            // Only hide warning and green feedback
+            const passwordWarning = document.getElementById('password-warning');
+            const passwordOk = document.getElementById('password-ok');
+            passwordWarning.style.display = 'none';
+            passwordOk.style.display = 'none';
+        }
 
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-md flex-shrink-0 me-2">
-                                            <span class="avatar-title bg-secondary-subtle rounded-circle">
-                                                <img src="{% static '/images/products/logo/logo-3.svg' %}" alt=""
-                                                    height="22">
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span class="text-muted fs-12">Automotive</span> <br />
-                                            <h5 class="fs-14 mt-1">AutoGear - Germany</h5>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Established</span>
-                                    <h5 class="fs-14 mt-1 fw-normal">Since 2005</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Stores</span> <br />
-                                    <h5 class="fs-14 mt-1 fw-normal">50</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Products</span>
-                                    <h5 class="fs-14 mt-1 fw-normal">850</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Status</span>
-                                    <h5 class="fs-14 mt-1 fw-normal"><i
-                                            class="ti ti-circle-filled fs-12 text-warning"></i> Pending
-                                    </h5>
-                                </td>
-                            </tr>
+        function isValidPhone(phone) {
+            return /^[0-9]{10}$/.test(phone);
+        }
 
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-md flex-shrink-0 me-2">
-                                            <span class="avatar-title bg-danger-subtle rounded-circle">
-                                                <img src="{% static '/images/products/logo/logo-4.svg' %}" alt=""
-                                                    height="22">
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span class="text-muted fs-12">Fashion</span> <br />
-                                            <h5 class="fs-14 mt-1">StyleCore - Italy</h5>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Established</span>
-                                    <h5 class="fs-14 mt-1 fw-normal">Since 1998</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Stores</span> <br />
-                                    <h5 class="fs-14 mt-1 fw-normal">200</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Products</span>
-                                    <h5 class="fs-14 mt-1 fw-normal">2,300</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Status</span>
-                                    <h5 class="fs-14 mt-1 fw-normal"><i
-                                            class="ti ti-circle-filled fs-12 text-danger"></i> Inactive
-                                    </h5>
-                                </td>
-                            </tr>
+        function isValidPassword(password) {
+            return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(password);
+        }
 
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-md flex-shrink-0 me-2">
-                                            <span class="avatar-title bg-success-subtle rounded-circle">
-                                                <img src="{% static '/images/products/logo/logo-5.svg' %}" alt=""
-                                                    height="22">
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span class="text-muted fs-12">Tech</span> <br />
-                                            <h5 class="fs-14 mt-1">TechVerse - India</h5>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Established</span>
-                                    <h5 class="fs-14 mt-1 fw-normal">Since 2020</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Stores</span> <br />
-                                    <h5 class="fs-14 mt-1 fw-normal">400</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Products</span>
-                                    <h5 class="fs-14 mt-1 fw-normal">7,500</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Status</span>
-                                    <h5 class="fs-14 mt-1 fw-normal"><i
-                                            class="ti ti-circle-filled fs-12 text-success"></i> Active
-                                    </h5>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
 
-                </div> <!-- end table-responsive-->
-            </div> <!-- end card-body-->
+            const phone = phoneInput.value.trim();
+            const password = passwordInput.value.trim();
+            responseDiv.textContent = "";
 
-            <div class="card-footer">
-                <div class="align-items-center justify-content-between row text-center text-sm-start">
-                    <div class="col-sm">
-                        <div class="text-muted">
-                            Showing <span class="fw-semibold">5</span> of <span class="fw-semibold">15</span> Results
-                        </div>
-                    </div>
-                    <div class="col-sm-auto mt-3 mt-sm-0">
-                        <ul class="pagination pagination-boxed pagination-sm mb-0 justify-content-center">
-                            <li class="page-item disabled">
-                                <a href="#" class="page-link"><i class="ti ti-chevron-left"></i></a>
-                            </li>
-                            <li class="page-item active">
-                                <a href="#" class="page-link">1</a>
-                            </li>
-                            <li class="page-item">
-                                <a href="#" class="page-link">2</a>
-                            </li>
-                            <li class="page-item">
-                                <a href="#" class="page-link">3</a>
-                            </li>
-                            <li class="page-item">
-                                <a href="#" class="page-link"><i class="ti ti-chevron-right"></i></a>
-                            </li>
-                        </ul>
-                    </div>
-                </div> <!-- -->
-            </div>
+            // Clear any pending timeouts
+            clearTimeout(phoneValidationTimeout);
+            clearTimeout(passwordValidationTimeout);
 
-        </div> <!-- end card-->
-    </div> <!-- end col-->
+            // Force validation on submit
+            let isValid = true;
 
-    <div class="col-xxl-6">
-        <div class="card card-h-100">
-            <div class="card-header d-flex flex-wrap align-items-center gap-2">
-                <h4 class="header-title me-auto">Recent New Signup</h4>
+            if (!isValidPhone(phone)) {
+                phoneInput.classList.add('is-invalid');
+                phoneInput.classList.remove('is-valid');
+                responseDiv.textContent = "Invalid phone number. Must be exactly 10 digits.";
+                isValid = false;
+            } else {
+                phoneInput.classList.add('is-valid');
+                phoneInput.classList.remove('is-invalid');
+            }
 
-                <div class="d-flex gap-2 justify-content-end text-end">
-                    <a href="javascript:void(0);" class="btn btn-sm btn-light">Import <i
-                            class="ti ti-download ms-1"></i></a>
-                    <a href="javascript:void(0);" class="btn btn-sm btn-primary">Export <i
-                            class="ti ti-file-export ms-1"></i></a>
-                </div>
-            </div>
+            if (!isValidPassword(password)) {
+                passwordInput.classList.add('is-invalid');
+                passwordInput.classList.remove('is-valid');
+                if (isValid) { // Only show if phone is valid
+                    responseDiv.textContent = "Password must have 1 uppercase, 1 lowercase, 1 number, 1 special character and be 8+ characters long.";
+                }
+                isValid = false;
+            } else {
+                passwordInput.classList.add('is-valid');
+                passwordInput.classList.remove('is-invalid');
+            }
 
-            <div class="card-body p-0">
-                <div class="bg-light bg-opacity-50 py-1 text-center">
-                    <p class="m-0"><b>895k</b> Active users out of <span class="fw-medium">965k</span>
-                    </p>
-                </div>
+            if (!isValid) {
+                return;
+            }
 
-                <div class="table-responsive">
-                    <table class="table table-custom table-centered table-sm table-nowrap table-hover mb-0">
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-md flex-shrink-0 me-2">
-                                            <span class="avatar-title bg-primary-subtle rounded-circle">
-                                                <img src="{% static '/images/users/avatar-1.jpg' %}" alt="" height="22"
-                                                    class="rounded-circle">
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span class="text-muted fs-12">Name</span> <br />
-                                            <h5 class="fs-14 mt-1">John Doe</h5>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Email</span>
-                                    <h5 class="fs-14 mt-1 fw-normal">john.doe@example.com</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Role</span> <br />
-                                    <h5 class="fs-14 mt-1 fw-normal">Administrator</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Status</span>
-                                    <h5 class="fs-14 mt-1 fw-normal"><i
-                                            class="ti ti-circle-filled fs-12 text-success"></i> Active
-                                    </h5>
-                                </td>
-                                <td style="width: 30px;">
-                                    <div class="dropdown">
-                                        <a href="#" class="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="ti ti-dots-vertical"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="javascript:void(0);" class="dropdown-item">View
-                                                Profile</a>
-                                            <a href="javascript:void(0);" class="dropdown-item">Deactivate</a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
+            // Disable button and show spinner
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Logging in...';
+            submitBtn.disabled = true;
 
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-md flex-shrink-0 me-2">
-                                            <span class="avatar-title bg-info-subtle rounded-circle">
-                                                <img src="{% static '/images/users/avatar-2.jpg' %}" alt="" height="22"
-                                                    class="rounded-circle">
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span class="text-muted fs-12">Name</span> <br />
-                                            <h5 class="fs-14 mt-1">Jane Smith</h5>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Email</span>
-                                    <h5 class="fs-14 mt-1 fw-normal">jane.smith@example.com</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Role</span> <br />
-                                    <h5 class="fs-14 mt-1 fw-normal">Editor</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Status</span>
-                                    <h5 class="fs-14 mt-1 fw-normal"><i
-                                            class="ti ti-circle-filled fs-12 text-warning"></i> Pending
-                                    </h5>
-                                </td>
-                                <td style="width: 30px;">
-                                    <div class="dropdown">
-                                        <a href="#" class="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="ti ti-dots-vertical"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="javascript:void(0);" class="dropdown-item">View
-                                                Profile</a>
-                                            <a href="javascript:void(0);" class="dropdown-item">Activate</a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
+            fetch("http://127.0.0.1:5000/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ Ph_No: phone, Password: password }),
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    responseDiv.classList.remove("text-danger", "text-success");
 
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-md flex-shrink-0 me-2">
-                                            <span class="avatar-title bg-secondary-subtle rounded-circle">
-                                                <img src="{% static '/images/users/avatar-3.jpg' %}" alt="" height="22"
-                                                    class="rounded-circle">
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span class="text-muted fs-12">Name</span> <br />
-                                            <h5 class="fs-14 mt-1">Michael Brown</h5>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Email</span>
-                                    <h5 class="fs-14 mt-1 fw-normal">michael.brown@example.com</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Role</span> <br />
-                                    <h5 class="fs-14 mt-1 fw-normal">Viewer</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Status</span>
-                                    <h5 class="fs-14 mt-1 fw-normal"><i
-                                            class="ti ti-circle-filled fs-12 text-danger"></i> Inactive
-                                    </h5>
-                                </td>
-                                <td style="width: 30px;">
-                                    <div class="dropdown">
-                                        <a href="#" class="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="ti ti-dots-vertical"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="javascript:void(0);" class="dropdown-item">Activate</a>
-                                            <a href="javascript:void(0);" class="dropdown-item">Delete</a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
+                    if (data.status === "success") {
+                        responseDiv.classList.add("text-success");
+                        responseDiv.textContent = data.message;
 
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-md flex-shrink-0 me-2">
-                                            <span class="avatar-title bg-warning-subtle rounded-circle">
-                                                <img src="{% static '/images/users/avatar-4.jpg' %}" alt="" height="22"
-                                                    class="rounded-circle">
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span class="text-muted fs-12">Name</span> <br />
-                                            <h5 class="fs-14 mt-1">Emily Davis</h5>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Email</span>
-                                    <h5 class="fs-14 mt-1 fw-normal">emily.davis@example.com</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Role</span> <br />
-                                    <h5 class="fs-14 mt-1 fw-normal">Manager</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Status</span>
-                                    <h5 class="fs-14 mt-1 fw-normal"><i
-                                            class="ti ti-circle-filled fs-12 text-success"></i> Active
-                                    </h5>
-                                </td>
-                                <td style="width: 30px;">
-                                    <div class="dropdown">
-                                        <a href="#" class="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="ti ti-dots-vertical"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="javascript:void(0);" class="dropdown-item">View
-                                                Profile</a>
-                                            <a href="javascript:void(0);" class="dropdown-item">Deactivate</a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
+                        // Save JWT token
+                        JWT_AUTH.setToken(data.access_token);
 
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-md flex-shrink-0 me-2">
-                                            <span class="avatar-title bg-danger-subtle rounded-circle">
-                                                <img src="{% static '/images/users/avatar-5.jpg' %}" alt="" height="22"
-                                                    class="rounded-circle">
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span class="text-muted fs-12">Name</span> <br />
-                                            <h5 class="fs-14 mt-1">Robert Taylor</h5>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Email</span>
-                                    <h5 class="fs-14 mt-1 fw-normal">robert.taylor@example.com</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Role</span> <br />
-                                    <h5 class="fs-14 mt-1 fw-normal">Support</h5>
-                                </td>
-                                <td>
-                                    <span class="text-muted fs-12">Status</span>
-                                    <h5 class="fs-14 mt-1 fw-normal"><i
-                                            class="ti ti-circle-filled fs-12 text-warning"></i> Pending
-                                    </h5>
-                                </td>
-                                <td style="width: 30px;">
-                                    <div class="dropdown">
-                                        <a href="#" class="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="ti ti-dots-vertical"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="javascript:void(0);" class="dropdown-item">View
-                                                Profile</a>
-                                            <a href="javascript:void(0);" class="dropdown-item">Activate</a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        // Redirect based on user type
+                        const userType = data.user.Type_of_User;
+                        let redirectUrl;
 
-                </div> <!-- end table-responsive-->
-            </div> <!-- end card-body-->
+                        switch (userType) {
+                            case 'GroundStaff':
+                                redirectUrl = "{% url 'pages:dynamic_pages' template_name='ground-staff' %}";
+                                break;
+                            case 'StationAdmin':
+                                redirectUrl = "{% url 'pages:dynamic_pages' template_name='ground-staff' %}"; // or station-admin page
+                                break;
+                            case 'ZonalHead':
+                                redirectUrl = "{% url 'pages:dynamic_pages' template_name='ground-staff' %}"; // or zonal-head page
+                                break;
+                            default:
+                                redirectUrl = "{% url 'pages:dynamic_pages' template_name='ground-staff' %}";
+                        }
 
-            <div class="card-footer">
-                <div class="align-items-center justify-content-between row text-center text-sm-start">
-                    <div class="col-sm">
-                        <div class="text-muted">
-                            Showing <span class="fw-semibold">5</span> of <span class="fw-semibold">10</span> Results
-                        </div>
-                    </div>
-                    <div class="col-sm-auto mt-3 mt-sm-0">
-                        <ul class="pagination pagination-boxed pagination-sm mb-0 justify-content-center">
-                            <li class="page-item disabled">
-                                <a href="#" class="page-link"><i class="ti ti-chevron-left"></i></a>
-                            </li>
-                            <li class="page-item active">
-                                <a href="#" class="page-link">1</a>
-                            </li>
-                            <li class="page-item">
-                                <a href="#" class="page-link">2</a>
-                            </li>
-                            <li class="page-item">
-                                <a href="#" class="page-link"><i class="ti ti-chevron-right"></i></a>
-                            </li>
-                        </ul>
-                    </div>
-                </div> <!-- -->
-            </div>
-        </div> <!-- end card-->
-    </div> <!-- end col-->
-</div> <!-- end row-->
+                        // Small delay to show success message, then redirect
+                        setTimeout(() => {
+                            window.location.href = redirectUrl;
+                        }, 1500);
+                    } else {
+                        responseDiv.classList.add("text-danger");
+                        responseDiv.textContent = data.message;
+                    }
+                })
+                .catch(() => {
+                    responseDiv.classList.remove("text-success");
+                    responseDiv.classList.add("text-danger");
+                    responseDiv.textContent = "An error occurred during login.";
+                })
+                .finally(() => {
+                    if (!responseDiv.classList.contains("text-success")) {
+                        submitBtn.innerHTML = "Login";
+                        submitBtn.disabled = false;
+                    }
+                });
+        });
+    });
+</script>
 
-<div class="row">
-    <div class="col-xl-8">
-        <div class="card">
-            <div class="card-header d-flex flex-wrap align-items-center gap-2 border-bottom border-dashed">
-                <h4 class="header-title me-auto">Visitor Traffics</h4>
+<style>
+    .shake {
+        animation: shake 0.5s;
+    }
 
-                <div>
-                    <button type="button" class="btn btn-light btn-sm">
-                        All
-                    </button>
-                    <button type="button" class="btn btn-light active btn-sm">
-                        1M
-                    </button>
-                    <button type="button" class="btn btn-light btn-sm">
-                        6M
-                    </button>
-                    <button type="button" class="btn btn-light btn-sm">
-                        1Y
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-xl-7">
-                        <div id="world-map-markers-line" style="height: 300px"></div>
-                    </div>
-                    <div class="col-xl-5" dir="ltr">
-                        <div class="p-3">
-                            <!-- Country Data -->
-                            <div class="d-flex justify-content-between align-items-center">
-                                <p class="mb-1"><img src="{% static '/images/flags/us.svg' %}" alt="user-image"
-                                        class="me-1 rounded-circle" height="20"> <span class="align-middle">United
-                                        States</span> </p>
-                                <div>
-                                    <h5 class="fw-semibold mb-0">67.5k
-                                    </h5>
-                                </div>
-                            </div>
-                            <div class="row align-items-center mb-3">
-                                <div class="col">
-                                    <div class="progress progress-soft progress-sm">
-                                        <div class="progress-bar bg-secondary" role="progressbar" style="width: 72.15%"
-                                            aria-valuenow="72.15" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                                <div class="col-auto">
-                                    <p class="mb-0 text-muted fs-13">72.15%</p>
-                                </div>
-                            </div>
+    @keyframes shake {
 
-                            <!-- Country Data -->
-                            <div class="d-flex justify-content-between align-items-center">
-                                <p class="mb-1"><img src="{% static '/images/flags/in.svg' %}" alt="user-image"
-                                        class="me-1 rounded-circle" height="20"> <span class="align-middle">India</span>
-                                </p>
-                                <div>
-                                    <h5 class="fw-semibold mb-0">7.92k
-                                    </h5>
-                                </div>
-                            </div>
-                            <div class="row align-items-center mb-3">
-                                <div class="col">
-                                    <div class="progress progress-soft progress-sm">
-                                        <div class="progress-bar bg-info" role="progressbar" style="width: 28.65%"
-                                            aria-valuenow="28.65" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                                <div class="col-auto">
-                                    <p class="mb-0 text-muted fs-13">28.65%</p>
-                                </div>
-                            </div>
+        0%,
+        20%,
+        40%,
+        60%,
+        80% {
+            transform: translateX(-5px);
+        }
 
-                            <!-- Country Data -->
-                            <div class="d-flex justify-content-between align-items-center">
-                                <p class="mb-1"><img src="{% static '/images/flags/br.svg' %}" alt="user-image"
-                                        class="me-1 rounded-circle" height="20"> <span
-                                        class="align-middle">Brazil</span> </p>
-                                <div>
-                                    <h5 class="fw-semibold mb-0">89.05k
-                                    </h5>
-                                </div>
-                            </div>
-                            <div class="row align-items-center mb-3">
-                                <div class="col">
-                                    <div class="progress progress-soft progress-sm">
-                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 62.5%"
-                                            aria-valuenow="62.5" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                                <div class="col-auto">
-                                    <p class="mb-0 text-muted fs-13">62.5%</p>
-                                </div>
-                            </div>
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+            transform: translateX(5px);
+        }
+    }
 
-                            <!-- Country Data -->
-                            <div class="d-flex justify-content-between align-items-center">
-                                <p class="mb-1"><img src="{% static '/images/flags/ca.svg' %}" alt="user-image"
-                                        class="me-1 rounded-circle" height="20"> <span
-                                        class="align-middle">Canada</span> </p>
-                                <div>
-                                    <h5 class="fw-semibold mb-0">5.3k
-                                    </h5>
-                                </div>
-                            </div>
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <div class="progress progress-soft progress-sm">
-                                        <div class="progress-bar bg-success" role="progressbar" style="width: 42.2%"
-                                            aria-valuenow="42.2" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                                <div class="col-auto">
-                                    <p class="mb-0 text-muted fs-13">42.2%</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> <!-- end card-body-->
-        </div> <!-- end card-->
-    </div> <!-- end col-->
+    .position-relative .btn-link {
+        z-index: 5;
+    }
 
-    <div class="col-xl-4">
-        <div class="card">
-            <div class="card-header d-flex flex-wrap align-items-center gap-2 border-bottom border-dashed">
-                <h4 class="header-title me-auto">Data Uses</h4>
+    .btn-link:focus {
+        box-shadow: none;
+    }
 
-                <div class="d-flex gap-2 justify-content-end text-end">
-                    <a href="javascript:void(0);" class="btn btn-sm btn-primary">Refresh <i
-                            class="ti ti-file-export ms-1"></i></a>
-                </div>
-            </div>
-            <div class="card-body">
-                <div dir="ltr">
-                    <div id="data-visits-chart" class="apex-charts"
-                        data-colors="#188ae2,#6b5eae,#31ce77,#f34943,#fbcc5c,#35b8e0"></div>
-                </div>
-            </div> <!-- end card-body-->
-        </div> <!-- end card-->
-    </div> <!-- end col-->
-</div> <!-- end row-->
+    .invalid-feedback {
+        display: none;
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
 
-{% endblock page_content %}
+    .form-control.is-invalid~.invalid-feedback {
+        display: block;
+    }
 
-{% block extra_javascript %}
-<script src="{% static '/vendor/apexcharts/apexcharts.min.js' %}"></script>
+    .valid-feedback {
+        display: none;
+        color: #28a745;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
 
-<!-- Vector Map Js -->
-<script src="{% static '/vendor/jsvectormap/jsvectormap.min.js' %}"></script>
-<script src="{% static '/vendor/jsvectormap/maps/world-merc.js' %}"></script>
-<script src="{% static '/vendor/jsvectormap/maps/world.js' %}"></script>
+    .form-control.is-valid~.valid-feedback {
+        display: block;
+    }
 
-<!-- Projects Analytics Dashboard App js -->
-<script src="{% static '/js/pages/dashboard.js' %}"></script>
-{% endblock extra_javascript %}
+    .invalid-feedback ul li {
+        margin-bottom: 2px;
+        transition: color 0.3s ease;
+        font-size: 0.8rem;
+    }
+
+    .invalid-feedback .mb-2 {
+        font-weight: 600;
+        color: #dc3545;
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 3.6.4.4.4-.4'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+
+    .form-control.is-valid {
+        border-color: #28a745;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='m2.3 6.73.7-.7 1.4-1.4.7-.7-.7-.7L2.9 3 2.3 3.7l-.7.7 1.4 1.4z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+
+    .auth-brand {
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+
+    .auth-brand img {
+        height: 80px;
+        /* Increased size */
+        margin-right: 8px;
+        transition: height 0.2s;
+    }
+
+    .auth-brand h2 {
+        font-family: 'Inter', Arial, sans-serif;
+        font-weight: 600;
+        font-size: 2rem;
+        margin-bottom: 0;
+        color: #2d3a4a;
+    }
+</style>
+
+
+{% endblock content %}

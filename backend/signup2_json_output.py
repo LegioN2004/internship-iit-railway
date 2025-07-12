@@ -4,13 +4,13 @@ from flask_cors import CORS
 import hashlib
 import re
 
-app = Flask(__name__)  # ✅ Fixed ___name___ (not __name__)
+app = Flask(__name__)
 CORS(app)
 
 # ------------------- DB CONFIG -------------------
 
 # Try this connection string first
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:sumuchamp@localhost/train2'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost/train2'
 # Alternative if above doesn't work:
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:sumuchamp@localhost/train2'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -75,10 +75,10 @@ def show_stations():
     stations = Station.query.all()
     return jsonify([station.to_dict() for station in stations])
 
-@app.route('/signup', methods=['GET'])
-def show_signups():
-    users = Signup.query.all()
-    return jsonify([user.to_dict() for user in users])
+# @app.route('/signup', methods=['GET'])
+# def show_signups():
+#     users = Signup.query.all()
+#     return jsonify([user.to_dict() for user in users])
 
 @app.route('/signup', methods=['POST'])
 def create_signup():
