@@ -13,12 +13,13 @@ JWT_AUTH.fetchWithAuth("http://127.0.0.1:5000/trains")
       }
     }
 
-    // Transform data to gridjs format: [[sl_no, name, time, status], ...]
+    // Transform data to gridjs format: [[sl_no, name, time, status, report_id], ...]
     const tableData = (data.trains || []).map((item) => [
       item.sl_no,
       item.name,
       item.time,
       item.status,
+      item.report_id, // Include report_id as the 5th column
     ]);
 
     new gridjs.Grid({
@@ -91,16 +92,15 @@ JWT_AUTH.fetchWithAuth("http://127.0.0.1:5000/trains")
           name: "Train Status",
           width: "180px",
           formatter: (cell, row) => {
-            const trainName = row.cells[1].data;
-            const trainId = row.cells[0].data;
-            const isFinished = cell === "Finished";
-            const bgColor = isFinished ? "#28a745" : "#dc3545";
-            const hoverColor = isFinished ? "#218838" : "#c82333";
+            // Use row.cells[4].data for reportId
+            const reportId = row.cells[4].data;
+            const status = cell; // "Finished" or "Unfinished"
+            const bgColor = status === "Finished" ? "#28a745" : "#dc3545";
+            const hoverColor = status === "Finished" ? "#218838" : "#c82333";
 
+            // Always link to train-report page using report_id
             return gridjs.html(
-              `<a href="/train-report?name=${encodeURIComponent(
-                trainName
-              )}&status=${cell}&id=${trainId}"
+              `<a href="/train-report?id=${encodeURIComponent(reportId)}"
                  style="background-color: ${bgColor};
                         color: white;
                         padding: 8px 16px;
@@ -116,11 +116,17 @@ JWT_AUTH.fetchWithAuth("http://127.0.0.1:5000/trains")
                  onmouseout="this.style.backgroundColor='${bgColor}';
                              this.style.transform='translateY(0px)';
                              this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)';">
-                ${cell}
+                ${status}
               </a>`
             );
           },
           sort: true,
+        },
+        // Add this hidden column for report_id
+        {
+          id: "report_id",
+          name: "Report ID",
+          hidden: true,
         },
       ],
       sort: true,
@@ -166,8 +172,21 @@ JWT_AUTH.fetchWithAuth("http://127.0.0.1:5000/trains")
         alert("Please enter a train name.");
         return;
       }
-      // Send PATCH request to backend
-      JWT_AUTH.fetchWithAuth(`http://127.0.0.1:5000/trains/${trainId}`, {
+      // Find the report_id for this row (trainId is sl_no, not report_id)
+      let reportId = null;
+      // Find the row in the tableData that matches this sl_no
+      for (const row of tableData) {
+        if (row[0] === trainId) {
+          reportId = row[4];
+          break;
+        }
+      }
+      if (!reportId) {
+        alert("Could not find report ID for this train.");
+        return;
+      }
+      // Send PATCH request to backend using report_id
+      JWT_AUTH.fetchWithAuth(`http://127.0.0.1:5000/trains/${reportId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newName }),
@@ -176,27 +195,26 @@ JWT_AUTH.fetchWithAuth("http://127.0.0.1:5000/trains")
         .then((data) => {
           if (data.success) {
             // Update the table row in-place (no reload)
-            // Find the row in the gridjs table and update name and status
-            const row = input.closest("tr");
-            if (row) {
+            const rowEl = input.closest("tr");
+            if (rowEl) {
               // Update name cell
-              const nameCell = row.querySelector(`td:nth-child(2)`);
+              const nameCell = rowEl.querySelector(`td:nth-child(2)`);
               if (nameCell) {
                 nameCell.innerHTML = `<a href="/ground-staff?name=${encodeURIComponent(
                   newName
                 )}&status=Finished&id=${trainId}" style="color: #011bff; text-decoration: none; font-weight: 500;">${newName}</a>`;
               }
               // Update status cell
-              const statusCell = row.querySelector(`td:nth-child(4)`);
+              const statusCell = rowEl.querySelector(`td:nth-child(4)`);
               if (statusCell) {
-                statusCell.innerHTML = `<a href="/train-report?name=${encodeURIComponent(
-                  newName
-                )}&status=Finished&id=${trainId}"
-                  style="background-color: #28a745; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 500; display: inline-block; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
-                  onmouseover="this.style.backgroundColor='#218838';this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 8px rgba(0,0,0,0.2)';"
-                  onmouseout="this.style.backgroundColor='#28a745';this.style.transform='translateY(0px)';this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)';">
-                  Finished
-                </a>`;
+                statusCell.innerHTML = `<a href="/train-report?id=${encodeURIComponent(
+                  reportId
+                )}"
+                    style="background-color: #28a745; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 500; display: inline-block; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                    onmouseover="this.style.backgroundColor='#218838';this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 8px rgba(0,0,0,0.2)';"
+                    onmouseout="this.style.backgroundColor='#28a745';this.style.transform='translateY(0px)';this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)';">
+                    Finished
+                  </a>`;
               }
             }
             alert("Train name updated successfully!");
@@ -209,3 +227,18 @@ JWT_AUTH.fetchWithAuth("http://127.0.0.1:5000/trains")
         });
     };
   });
+
+// In train-report.html
+const urlParams = new URLSearchParams(window.location.search);
+const trainId = urlParams.get("id");
+if (trainId) {
+  fetch(`http://127.0.0.1:5000/train-report?id=${trainId}`, {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("authToken"),
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      // Fill your table with data, leaving cells blank if data[field] is empty
+    });
+}

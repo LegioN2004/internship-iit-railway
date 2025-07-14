@@ -48,6 +48,7 @@ def token_required(f):
         if 'Authorization' in request.headers:
             try:
                 token = request.headers['Authorization'].split(" ")[1]
+                # print(token)  # Debugging: print the token
             except IndexError:
                 return jsonify({'message': 'Invalid token format'}), 401
 
@@ -65,8 +66,17 @@ def token_required(f):
 
 # ------------------- MODELS -------------------
 
+
+
+# ------------------- ROUTES -------------------
+
+@app.route('/')
+def home():
+    return jsonify({"message": "Welcome to the JWT-Protected Train API!"})
+
+
 class Station(db.Model):
-    _tablename_ = 'station'
+    __tablename__ = 'station'
     SI_No = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Station_Name = db.Column(db.String(100))
     Station_Code = db.Column(db.String(20), unique=True)
@@ -78,8 +88,17 @@ class Station(db.Model):
             'Station_Code': self.Station_Code
         }
 
+
+@app.route('/stations')
+def show_stations():
+    stations = Station.query.all()
+    return jsonify([station.to_dict() for station in stations])
+
+# ------------------- SIGNUP -------------------
+
+
 class Signup(db.Model):
-    _tablename_ = 'signup'
+    __tablename__ = 'signup'
     SI_No = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Ph_No = db.Column(db.BigInteger, unique=True)
     Station_Code = db.Column(db.String(20), db.ForeignKey('station.Station_Code'), nullable=True)
@@ -96,18 +115,6 @@ class Signup(db.Model):
             'Name': self.Name
         }
 
-# ------------------- ROUTES -------------------
-
-@app.route('/')
-def home():
-    return jsonify({"message": "Welcome to the JWT-Protected Train API!"})
-
-@app.route('/stations')
-def show_stations():
-    stations = Station.query.all()
-    return jsonify([station.to_dict() for station in stations])
-
-# ------------------- SIGNUP -------------------
 
 @app.route('/signup', methods=['POST'])
 def create_signup():
@@ -201,44 +208,45 @@ def login():
 # ------------------- TRAIN DATA (PROTECTED) -------------------
 
 
-# Define Goodstrain model for fetching train data
-class Goodstrain(db.Model):
-    __tablename__ = 'goodstrains'
-    Sl_No = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    Train_Name = db.Column(db.String(50))
-    Train_Status = db.Column(db.String(20))
 
-    def to_dict(self):
-        return {
-            'sl_no': self.Sl_No,
-            'name': self.Train_Name,
-            'status': self.Train_Status
-        }
+class Goodstrain:
+    pass  # Dummy class to avoid breaking references, but not a model
+
+
 
 @app.route('/trains', methods=['GET'])
 @token_required
 def get_trains(current_user):
-    # Fetch train data from the goodstrain table
-    trains = Goodstrain.query.all()
-    # Get current time in HH:MM AM/PM format
-    now = datetime.now().strftime('%I:%M %p')
-    train_list = []
-    for train in trains:
-        train_dict = train.to_dict()
-        train_dict['time'] = now  # Always use current time
-        train_list.append(train_dict)
-
-    # Get the user's station name
+    # Only show trains/reports for the user's station
     station_name = None
+    trains = []
     if current_user.Station_Code:
         station = Station.query.filter_by(Station_Code=current_user.Station_Code).first()
         if station:
             station_name = station.Station_Name
+        # Query reports for this station only
+        trains = Report.query.filter_by(Station_Code=current_user.Station_Code).all()
+    else:
+        # If user has no station, show all trains (fallback)
+        trains = Report.query.all()
+    now = datetime.now().strftime('%I:%M %p')
+    train_list = []
+    for train in trains:
+        train_dict = train.to_dict()
+        train_dict['time'] = train.Time.strftime('%I:%M %p') if train.Time else now
+        # For compatibility with frontend, add sl_no, name, report_id, status
+        train_dict['sl_no'] = train.SI_No
+        train_dict['name'] = train.Train_Name
+        train_dict['report_id'] = train.Report_ID
+        train_dict['status'] = "Finished" if train.Status else "Unfinished"
+        train_list.append(train_dict)
 
     return jsonify({
         'trains': train_list,
-        'station_name': station_name
+        'station_name': station_name,
     }), 200
+
+
 
 # ------------------- PROFILE (PROTECTED) -------------------
 
@@ -249,6 +257,85 @@ def profile(current_user):
         "status": "success",
         "user": current_user.to_dict()
     })
+
+# ------------------- TRAIN REPORT (PROTECTED) -------------------
+
+
+class Report(db.Model):
+    __tablename__ = 'report'
+    SI_No = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    Train_Name = db.Column(db.String(50))
+    Report_ID = db.Column(db.String(20), unique=True)
+    Wagon_No = db.Column(db.Integer)
+    Coach_Position = db.Column(db.Integer)
+    Door_No = db.Column(db.Integer)
+    Camera_No = db.Column(db.Integer)
+    Date = db.Column(db.Date)
+    Time = db.Column(db.Time)
+    Status = db.Column(db.Boolean)
+    Report_Remark = db.Column(db.Text)
+    Station_Code = db.Column(db.String(20), db.ForeignKey('station.Station_Code'))
+    Case_ID = db.Column(db.Integer, unique=True)
+    Image_Link = db.Column(db.String(255))
+    Ph_No = db.Column(db.BigInteger)
+
+    def to_dict(self):
+        return {
+            'SI_No': self.SI_No,
+            'Train_Name': self.Train_Name,
+            'Report_ID': self.Report_ID,
+            'Wagon_No': self.Wagon_No,
+            'Coach_Position': self.Coach_Position,
+            'Door_No': self.Door_No,
+            'Camera_No': self.Camera_No,
+            'Date': self.Date.isoformat() if self.Date else None,
+            'Time': self.Time.isoformat() if self.Time else None,
+            'Status': "Closed" if self.Status else "Open",
+            'Report_Remark': self.Report_Remark,
+            'Station_Code': self.Station_Code,
+            'Case_ID': self.Case_ID,
+            'Image_Link': self.Image_Link,
+            'Ph_No': self.Ph_No
+        }
+
+
+
+@app.route('/reports', methods=['GET'])
+def get_reports():
+    reports = Report.query.all()
+    return jsonify([report.to_dict() for report in reports])
+
+
+# Endpoint for train report by Report_ID (single definition)
+@app.route('/train-report', methods=['GET'])
+@token_required
+def train_report(current_user):
+    report_id = request.args.get('id')
+    if report_id:
+        report = Report.query.filter_by(Report_ID=report_id).first()
+    else:
+        # If no id provided, return the first report (by SI_No)
+        report = Report.query.order_by(Report.SI_No.asc()).first()
+    if not report:
+        return jsonify({'error': 'Report not found'}), 404
+    return jsonify(report.to_dict())
+
+
+
+
+@app.route('/trains/<report_id>', methods=['PATCH'])
+@token_required
+def update_train(current_user, report_id):
+    data = request.get_json()
+    new_name = data.get('name')
+    report = Report.query.filter_by(Report_ID=report_id).first()
+    if not report:
+        return jsonify({'error': 'Report not found'}), 404
+    report.Train_Name = new_name
+    report.Status = True  # Mark as finished
+    db.session.commit()
+    return jsonify({'success': True, 'updated_report': report.to_dict()})
+
 
 # ------------------- MAIN -------------------
 

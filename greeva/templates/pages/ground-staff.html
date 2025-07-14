@@ -59,15 +59,12 @@
 
     console.log("User is authenticated, proceeding with page load");
 
-    // date Format: Friday, July 04, 2025
+    // date Format: 13/07/2025 (DD/MM/YYYY format)
     function formatDate(date) {
-        const options = {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: '2-digit',
-        };
-        return date.toLocaleString('en-US', options);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
     }
 
     // Set current date
