@@ -1,6 +1,15 @@
 // Ground Staff Logic JavaScript for tables-gridjs.html
 // This file handles the train table display and navigation
 
+function dateTime() {
+  const now = new Date();
+  return now.toLocaleString("en-US", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 // Fetch trains data from the Flask backend with authentication
 JWT_AUTH.fetchWithAuth("http://127.0.0.1:5000/trains")
   .then((res) => res.json())

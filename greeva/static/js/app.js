@@ -118,79 +118,79 @@ class App {
     }
 
     // Left Sidebar Menu (Vertical Menu)
-    initLeftSidebar() {
-        var self = this;
+    // initLeftSidebar() {
+    //     var self = this;
 
-        if ($(".side-nav").length) {
-            var navCollapse = $('.side-nav li .collapse');
-            var navToggle = $(".side-nav li [data-bs-toggle='collapse']");
-            navToggle.on('click', function (e) {
-                return false;
-            });
+    //     if ($(".side-nav").length) {
+    //         var navCollapse = $('.side-nav li .collapse');
+    //         var navToggle = $(".side-nav li [data-bs-toggle='collapse']");
+    //         navToggle.on('click', function (e) {
+    //             return false;
+    //         });
 
-            // open one menu at a time only
-            navCollapse.on({
-                'show.bs.collapse': function (event) {
-                    var parent = $(event.target).parents('.collapse.show');
-                    $('.side-nav .collapse.show').not(event.target).not(parent).collapse('hide');
-                }
-            });
+    //         // open one menu at a time only
+    //         navCollapse.on({
+    //             'show.bs.collapse': function (event) {
+    //                 var parent = $(event.target).parents('.collapse.show');
+    //                 $('.side-nav .collapse.show').not(event.target).not(parent).collapse('hide');
+    //             }
+    //         });
 
-            // activate the menu in left side bar (Vertical Menu) based on url
-            $(".side-nav a").each(function () {
-                var pageUrl = window.location.href.split(/[?#]/)[0];
-                if (this.href == pageUrl) {
-                    $(this).addClass("active");
-                    $(this).parent().addClass("active");
-                    $(this).parent().parent().parent().addClass("show");
-                    $(this).parent().parent().parent().parent().addClass("active"); // add active to li of the current link
+    //         // activate the menu in left side bar (Vertical Menu) based on url
+    //         $(".side-nav a").each(function () {
+    //             var pageUrl = window.location.href.split(/[?#]/)[0];
+    //             if (this.href == pageUrl) {
+    //                 $(this).addClass("active");
+    //                 $(this).parent().addClass("active");
+    //                 $(this).parent().parent().parent().addClass("show");
+    //                 $(this).parent().parent().parent().parent().addClass("active"); // add active to li of the current link
 
-                    var firstLevelParent = $(this).parent().parent().parent().parent().parent().parent();
-                    if (firstLevelParent.attr('id') !== 'sidebar-menu') firstLevelParent.addClass("show");
+    //                 var firstLevelParent = $(this).parent().parent().parent().parent().parent().parent();
+    //                 if (firstLevelParent.attr('id') !== 'sidebar-menu') firstLevelParent.addClass("show");
 
-                    $(this).parent().parent().parent().parent().parent().parent().parent().addClass("active");
+    //                 $(this).parent().parent().parent().parent().parent().parent().parent().addClass("active");
 
-                    var secondLevelParent = $(this).parent().parent().parent().parent().parent().parent().parent().parent().parent();
-                    if (secondLevelParent.attr('id') !== 'wrapper') secondLevelParent.addClass("show");
+    //                 var secondLevelParent = $(this).parent().parent().parent().parent().parent().parent().parent().parent().parent();
+    //                 if (secondLevelParent.attr('id') !== 'wrapper') secondLevelParent.addClass("show");
 
-                    var upperLevelParent = $(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().parent();
-                    if (!upperLevelParent.is('body')) upperLevelParent.addClass("active");
-                }
-            });
+    //                 var upperLevelParent = $(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().parent();
+    //                 if (!upperLevelParent.is('body')) upperLevelParent.addClass("active");
+    //             }
+    //         });
 
 
-            setTimeout(function () {
-                var activatedItem = document.querySelector('li.active .active');
-                if (activatedItem != null) {
-                    var simplebarContent = document.querySelector('.sidenav-menu .simplebar-content-wrapper');
-                    var offset = activatedItem.offsetTop - 300;
-                    if (simplebarContent && offset > 100) {
-                        scrollTo(simplebarContent, offset, 600);
-                    }
-                }
-            }, 200);
+    //         setTimeout(function () {
+    //             var activatedItem = document.querySelector('li.active .active');
+    //             if (activatedItem != null) {
+    //                 var simplebarContent = document.querySelector('.sidenav-menu .simplebar-content-wrapper');
+    //                 var offset = activatedItem.offsetTop - 300;
+    //                 if (simplebarContent && offset > 100) {
+    //                     scrollTo(simplebarContent, offset, 600);
+    //                 }
+    //             }
+    //         }, 200);
 
-            // scrollTo (Left Side Bar Active Menu)
-            function easeInOutQuad(t, b, c, d) {
-                t /= d / 2;
-                if (t < 1) return c / 2 * t * t + b;
-                t--;
-                return -c / 2 * (t * (t - 2) - 1) + b;
-            }
-            function scrollTo(element, to, duration) {
-                var start = element.scrollTop, change = to - start, currentTime = 0, increment = 20;
-                var animateScroll = function () {
-                    currentTime += increment;
-                    var val = easeInOutQuad(currentTime, start, change, duration);
-                    element.scrollTop = val;
-                    if (currentTime < duration) {
-                        setTimeout(animateScroll, increment);
-                    }
-                };
-                animateScroll();
-            }
-        }
-    }
+    //         // scrollTo (Left Side Bar Active Menu)
+    //         function easeInOutQuad(t, b, c, d) {
+    //             t /= d / 2;
+    //             if (t < 1) return c / 2 * t * t + b;
+    //             t--;
+    //             return -c / 2 * (t * (t - 2) - 1) + b;
+    //         }
+    //         function scrollTo(element, to, duration) {
+    //             var start = element.scrollTop, change = to - start, currentTime = 0, increment = 20;
+    //             var animateScroll = function () {
+    //                 currentTime += increment;
+    //                 var val = easeInOutQuad(currentTime, start, change, duration);
+    //                 element.scrollTop = val;
+    //                 if (currentTime < duration) {
+    //                     setTimeout(animateScroll, increment);
+    //                 }
+    //             };
+    //             animateScroll();
+    //         }
+    //     }
+    // }
 
 
     // Topbar Menu (Horizontal Menu)
@@ -437,7 +437,7 @@ class App {
         this.initComponents();
         this.initPortletCard();
         this.initMultiDropdown();
-        this.initLeftSidebar()
+        // this.initLeftSidebar()
         this.initTopbarMenu();
         this.initfullScreenListener();
         this.initFormValidation();

@@ -97,9 +97,9 @@
         .topbar,
         .toolbar,
         .btn-back,
-        .sidenav-menu {
+        /* .sidenav-menu {
             display: none !important;
-        }
+        } */
 
         body {
             margin: 0;
@@ -135,14 +135,13 @@
 {% endblock extra_css %}
 
 {% block page_title %}
-{% include 'partials/page-title.html' with title="Ground Staff" subtitle="Reports" %}
 {% endblock page_title %}
 
 {% block page_content %}
 
-<div class="toolbar">
-    <a href="{% url 'pages:dynamic_pages' template_name='ground-staff' %}" class="btn-back">← Back to Trains</a>
-    <button class="btn-print" onclick="window.print()">🖨️ Print Report</button>
+<div class="toolbar mb-4">
+    <a href="{% url 'pages:dynamic_pages' template_name='ground-staff' %}" class="btn-back mt-2">← Back to Trains</a>
+    <button class="btn-print mt-2" onclick="window.print()">🖨️ Print Report</button>
 </div>
 
 <!-- Print Header (only visible when printing) -->

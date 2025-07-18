@@ -1,401 +1,62 @@
 {% load static i18n %}
 <!-- Topbar Start -->
 <header class="app-topbar">
-    <div class="page-container topbar-menu">
-        <div class="d-flex align-items-center gap-2">
+    <div class="page-container topbar-menu justify-content-between items-center">
+        <!-- Logo at the left -->
+        <a href="{% url 'pages:dashboard' %}" class="logo d-flex align-items-center">
+            <span class="logo-lg">
+                <img src="{% static 'images/IITG_logo_dark.png' %}" alt="IITG logo"
+                    style="width: 40px; height: 40px; margin-right: 10px;">
+            </span>
+                <div class="text-light fw-bold fs-19">IITG</div>
+        </a>
 
-            <!-- Sidebar Menu Toggle Button -->
-            <button class="sidenav-toggle-button px-2">
-                <i class="ti ti-menu-deep fs-24"></i>
-            </button>
-
-            <!-- Horizontal Menu Toggle Button -->
-            <button class="topnav-toggle-button px-2" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
-                <i class="ti ti-menu-deep fs-22"></i>
-            </button>
-
-            <!-- Button Trigger Search Modal -->
-            <div class="topbar-search text-muted d-none d-xl-flex gap-2 align-items-center" data-bs-toggle="modal"
-                data-bs-target="#searchModal" type="button">
-                <i class="ti ti-search fs-18"></i>
-                <span class="me-2">Search something..</span>
-                <span class="ms-auto fw-medium">⌘K</span>
-            </div>
-
-
-        </div>
-
-        <div class="d-flex align-items-center gap-2">
-
-            <!-- Search for small devices -->
-            <div class="topbar-item d-flex d-xl-none">
-                <button class="topbar-link" data-bs-toggle="modal" data-bs-target="#searchModal" type="button">
-                    <i class="ti ti-search fs-22"></i>
-                </button>
-            </div>
-
-
-
-            <!-- Notification Dropdown -->
-            <div class="topbar-item">
-                <div class="dropdown">
-                    <button class="topbar-link dropdown-toggle drop-arrow-none" data-bs-toggle="dropdown"
-                        data-bs-offset="0,25" type="button" data-bs-auto-close="outside" aria-haspopup="false"
-                        aria-expanded="false">
-                        <i class="ti ti-bell animate-ring fs-22"></i>
-                        <span class="noti-icon-badge bg-danger text-white rounded-circle"
-                            style="position: absolute; top: 4px; right: 4px; min-width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center;"
-                            id="alerts-count">10</span>
-                    </button>
-
-                    <div class="dropdown-menu p-0 dropdown-menu-end dropdown-menu-lg" style="min-height: 300px;">
-                        <div class="p-3 border-bottom border-dashed">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <h6 class="m-0 fs-16 fw-semibold">Alerts Pending (<span
-                                            id="notification-alerts-count">10</span>)</h6>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="position-relative z-2 card shadow-none rounded-0" style="max-height: 300px;"
-                            data-simplebar>
-                            <!-- item-->
-                            <div class="dropdown-item notification-item py-2 text-wrap active" id="notification-1">
-                                <span class="d-flex align-items-center">
-                                    <div class="avatar-md flex-shrink-0 me-3">
-                                        <span class="avatar-title bg-danger-subtle text-danger rounded-circle fs-22">
-                                            <i class="ti ti-train"></i>
-                                        </span>
-                                    </div>
-                                    <span class="flex-grow-1 text-muted">
-                                        <span class="fw-medium text-body">Shatabdi Express 12002</span> delayed by <span
-                                            class="fw-medium text-body">45 minutes</span> at Platform 3
-                                        <br />
-                                        <span class="fs-12">15m ago</span>
-                                    </span>
-                                    <span class="notification-item-close">
-                                        <button type="button"
-                                            class="btn btn-ghost-danger rounded-circle btn-sm btn-icon"
-                                            data-dismissible="#notification-1">
-                                            <i class="ti ti-x fs-16"></i>
-                                        </button>
-                                    </span>
-                                </span>
-                            </div>
-
-                            <!-- item-->
-                            <div class="dropdown-item notification-item py-2 text-wrap" id="notification-2">
-                                <span class="d-flex align-items-center">
-                                    <div class="avatar-md flex-shrink-0 me-3">
-                                        <span class="avatar-title bg-warning-subtle text-warning rounded-circle fs-22">
-                                            <i class="ti ti-tools"></i>
-                                        </span>
-                                    </div>
-                                    <span class="flex-grow-1 text-muted">
-                                        <span class="fw-medium text-body">Rajdhani Express 12951</span> maintenance
-                                        required for <span class="fw-medium text-body">Coach B3</span>
-                                        <br />
-                                        <span class="fs-12">32m ago</span>
-                                    </span>
-                                    <span class="notification-item-close">
-                                        <button type="button"
-                                            class="btn btn-ghost-danger rounded-circle btn-sm btn-icon"
-                                            data-dismissible="#notification-2">
-                                            <i class="ti ti-x fs-16"></i>
-                                        </button>
-                                    </span>
-                                </span>
-                            </div>
-
-                            <!-- item-->
-                            <div class="dropdown-item notification-item py-2 text-wrap" id="notification-3">
-                                <span class="d-flex align-items-center">
-                                    <div class="avatar-md flex-shrink-0 me-3">
-                                        <span class="avatar-title bg-success-subtle text-success rounded-circle fs-22">
-                                            <iconify-icon icon="solar:ticket-bold-duotone"></iconify-icon>
-                                        </span>
-                                    </div>
-                                    <span class="flex-grow-1 text-muted">
-                                        <span class="fw-medium text-body">Duronto Express 12259</span> arrived <span
-                                            class="fw-medium text-body">on time</span> at Platform 7
-                                        <br />
-                                        <span class="fs-12">1h ago</span>
-                                    </span>
-                                    <span class="notification-item-close">
-                                        <button type="button"
-                                            class="btn btn-ghost-danger rounded-circle btn-sm btn-icon"
-                                            data-dismissible="#notification-3">
-                                            <i class="ti ti-x fs-16"></i>
-                                        </button>
-                                    </span>
-                                </span>
-                            </div>
-
-                            <!-- item-->
-                            <div class="dropdown-item notification-item py-2 text-wrap" id="notification-4">
-                                <span class="d-flex align-items-center">
-                                    <div class="avatar-md flex-shrink-0 me-3">
-                                        <span class="avatar-title bg-info-subtle text-info rounded-circle fs-22">
-                                            <i class="ti ti-users"></i>
-                                        </span>
-                                    </div>
-                                    <span class="flex-grow-1 text-muted">
-                                        <span class="fw-medium text-body">Gatimaan Express 12049</span> crew change
-                                        completed at <span class="fw-medium text-body">Junction A</span>
-                                        <br />
-                                        <span class="fs-12">2h ago</span>
-                                    </span>
-                                    <span class="notification-item-close">
-                                        <button type="button"
-                                            class="btn btn-ghost-danger rounded-circle btn-sm btn-icon"
-                                            data-dismissible="#notification-4">
-                                            <i class="ti ti-x fs-16"></i>
-                                        </button>
-                                    </span>
-                                </span>
-                            </div>
-
-                            <!-- item-->
-                            <div class="dropdown-item notification-item py-2 text-wrap" id="notification-5">
-                                <span class="d-flex align-items-center">
-                                    <div class="avatar-md flex-shrink-0 me-3">
-                                        <span class="avatar-title bg-danger-subtle text-danger rounded-circle fs-22">
-                                            <i class="ti ti-alert-triangle"></i>
-                                        </span>
-                                    </div>
-                                    <span class="flex-grow-1 text-muted">
-                                        <span class="fw-medium text-body">Vande Bharat 20001</span> signal clearance
-                                        pending for <span class="fw-medium text-body">Track 2</span>
-                                        <br />
-                                        <span class="fs-12">3h ago</span>
-                                    </span>
-                                    <span class="notification-item-close">
-                                        <button type="button"
-                                            class="btn btn-ghost-danger rounded-circle btn-sm btn-icon"
-                                            data-dismissible="#notification-5">
-                                            <i class="ti ti-x fs-16"></i>
-                                        </button>
-                                    </span>
-                                </span>
-                            </div>
-
-                            <!-- item-->
-                            <div class="dropdown-item notification-item py-2 text-wrap" id="notification-6">
-                                <span class="d-flex align-items-center">
-                                    <div class="avatar-md flex-shrink-0 me-3">
-                                        <span class="avatar-title bg-success-subtle text-success rounded-circle fs-22">
-                                            <i class="ti ti-check"></i>
-                                        </span>
-                                    </div>
-                                    <span class="flex-grow-1 text-muted">
-                                        <span class="fw-medium text-body">Tejas Express 22119</span> departed
-                                        successfully from <span class="fw-medium text-body">Platform 5</span>
-                                        <br />
-                                        <span class="fs-12">4h ago</span>
-                                    </span>
-                                    <span class="notification-item-close">
-                                        <button type="button"
-                                            class="btn btn-ghost-danger rounded-circle btn-sm btn-icon"
-                                            data-dismissible="#notification-6">
-                                            <i class="ti ti-x fs-16"></i>
-                                        </button>
-                                    </span>
-                                </span>
-                            </div>
-
-                            <!-- item-->
-                            <div class="dropdown-item notification-item py-2 text-wrap" id="notification-7">
-                                <span class="d-flex align-items-center">
-                                    <div class="avatar-md flex-shrink-0 me-3">
-                                        <span class="avatar-title bg-warning-subtle text-warning rounded-circle fs-22">
-                                            <iconify-icon icon="solar:wrench-bold-duotone"></iconify-icon>
-                                        </span>
-                                    </div>
-                                    <span class="flex-grow-1 text-muted">
-                                        <span class="fw-medium text-body">Humsafar Express 12615</span> undergoing
-                                        scheduled <span class="fw-medium text-body">brake inspection</span>
-                                        <br />
-                                        <span class="fs-12">5h ago</span>
-                                    </span>
-                                    <span class="notification-item-close">
-                                        <button type="button"
-                                            class="btn btn-ghost-danger rounded-circle btn-sm btn-icon"
-                                            data-dismissible="#notification-7">
-                                            <i class="ti ti-x fs-16"></i>
-                                        </button>
-                                    </span>
-                                </span>
-                            </div>
-
-                            <!-- item-->
-                            <div class="dropdown-item notification-item py-2 text-wrap" id="notification-8">
-                                <span class="d-flex align-items-center">
-                                    <div class="avatar-md flex-shrink-0 me-3">
-                                        <span class="avatar-title bg-primary-subtle text-primary rounded-circle fs-22">
-                                            <i class="ti ti-clock"></i>
-                                        </span>
-                                    </div>
-                                    <span class="flex-grow-1 text-muted">
-                                        <span class="fw-medium text-body">Sampark Kranti 12274</span> rescheduled
-                                        arrival at <span class="fw-medium text-body">14:30 hrs</span>
-                                        <br />
-                                        <span class="fs-12">6h ago</span>
-                                    </span>
-                                    <span class="notification-item-close">
-                                        <button type="button"
-                                            class="btn btn-ghost-danger rounded-circle btn-sm btn-icon"
-                                            data-dismissible="#notification-8">
-                                            <i class="ti ti-x fs-16"></i>
-                                        </button>
-                                    </span>
-                                </span>
-                            </div>
-
-                            <!-- item-->
-                            <div class="dropdown-item notification-item py-2 text-wrap" id="notification-9">
-                                <span class="d-flex align-items-center">
-                                    <div class="avatar-md flex-shrink-0 me-3">
-                                        <span
-                                            class="avatar-title bg-secondary-subtle text-secondary rounded-circle fs-22">
-                                            <i class="ti ti-route"></i>
-                                        </span>
-                                    </div>
-                                    <span class="flex-grow-1 text-muted">
-                                        <span class="fw-medium text-body">Intercity Express 12049</span> route changed
-                                        to <span class="fw-medium text-body">Platform 1</span>
-                                        <br />
-                                        <span class="fs-12">7h ago</span>
-                                    </span>
-                                    <span class="notification-item-close">
-                                        <button type="button"
-                                            class="btn btn-ghost-danger rounded-circle btn-sm btn-icon"
-                                            data-dismissible="#notification-9">
-                                            <i class="ti ti-x fs-16"></i>
-                                        </button>
-                                    </span>
-                                </span>
-                            </div>
-
-                            <!-- item-->
-                            <div class="dropdown-item notification-item py-2 text-wrap" id="notification-10">
-                                <span class="d-flex align-items-center">
-                                    <div class="avatar-md flex-shrink-0 me-3">
-                                        <span class="avatar-title bg-info-subtle text-info rounded-circle fs-22">
-                                            <iconify-icon icon="solar:fuel-bold-duotone"></iconify-icon>
-                                        </span>
-                                    </div>
-                                    <span class="flex-grow-1 text-muted">
-                                        <span class="fw-medium text-body">Double Decker 12273</span> completed <span
-                                            class="fw-medium text-body">fuel refilling</span> at depot
-                                        <br />
-                                        <span class="fs-12">8h ago</span>
-                                    </span>
-                                    <span class="notification-item-close">
-                                        <button type="button"
-                                            class="btn btn-ghost-danger rounded-circle btn-sm btn-icon"
-                                            data-dismissible="#notification-10">
-                                            <i class="ti ti-x fs-16"></i>
-                                        </button>
-                                    </span>
-                                </span>
-                            </div>
-                        </div>
-
-                        <div style="height: 300px;"
-                            class="d-flex align-items-center justify-content-center text-center position-absolute top-0 bottom-0 start-0 end-0 z-1">
-                            <div>
-                                <iconify-icon icon="line-md:bell-twotone-alert-loop"
-                                    class="fs-80 text-secondary mt-2"></iconify-icon>
-                                <h4 class="fw-semibold mb-0 fst-italic lh-base mt-3">Hey! 👋 <br />You have no any
-                                    notifications</h4>
-                            </div>
-                        </div>
-
-                        <!-- All-->
-                        <a href="javascript:void(0);"
-                            class="dropdown-item text-center text-reset text-decoration-underline link-offset-2 fw-bold border-top border-light py-2 mt-2">
-                            View All Alerts
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-
-
-            <!-- Button Trigger Customizer Offcanvas -->
-            <div class="topbar-item d-none d-sm-flex">
-                <button class="topbar-link" data-bs-toggle="offcanvas" data-bs-target="#theme-settings-offcanvas"
-                    type="button">
-                    <i class="ti ti-settings fs-22"></i>
-                </button>
-            </div>
-
-            <!-- User Dropdown -->
-            <div class="topbar-item nav-user">
-                <div class="dropdown">
-                    <a class="topbar-link dropdown-toggle drop-arrow-none px-2" data-bs-toggle="dropdown"
-                        data-bs-offset="0,19" type="button" aria-haspopup="false" aria-expanded="false">
-                        <img src="{% static '/images/users/avatar-1.jpg' %}" width="32"
-                            class="rounded-circle me-lg-2 d-flex" alt="user-image">
-                        <span class="d-lg-flex flex-column gap-1 d-none" id="topbar-user-info">
-                            <h5 class="my-0" id="topbar-user-name">Human Being</h5>
-                            <h6 class="my-0 fw-normal" id="topbar-user-type">Ground Staff</h6>
-                        </span>
-                        <i class="ti ti-chevron-down d-none d-lg-block align-middle ms-2"></i>
+        <!-- User Dropdown at the right -->
+        <div class="topbar-item nav-user ms-auto">
+            <div class="dropdown">
+                <a class="topbar-link dropdown-toggle drop-arrow-none px-2" data-bs-toggle="dropdown"
+                    data-bs-offset="0,19" type="button" aria-haspopup="false" aria-expanded="false">
+                    <img src="{% static '/images/users/avatar-1.jpg' %}" width="32"
+                        class="rounded-circle me-lg-2 d-flex" alt="user-image">
+                    <span class="d-lg-flex flex-column gap-1 d-none" id="topbar-user-info">
+                        <h5 class="my-0" id="topbar-user-name">Human Being</h5>
+                        <h6 class="my-0 fw-normal" id="topbar-user-type">Ground Staff</h6>
+                    </span>
+                    <i class="ti ti-chevron-down d-none d-lg-block align-middle ms-2"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end">
+                    <!-- item-->
+                    <a href="javascript:void(0);" class="dropdown-item">
+                        <i class="ti ti-user-hexagon me-1 fs-17 align-middle"></i>
+                        <span class="align-middle">My Account</span>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-end">
-                        <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="ti ti-user-hexagon me-1 fs-17 align-middle"></i>
-                            <span class="align-middle">My Account</span>
-                        </a>
 
-                        <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="ti ti-settings me-1 fs-17 align-middle"></i>
-                            <span class="align-middle">Settings</span>
-                        </a>
+                    <!-- item-->
+                    <a href="javascript:void(0);" class="dropdown-item">
+                        <i class="ti ti-settings me-1 fs-17 align-middle"></i>
+                        <span class="align-middle">Settings</span>
+                    </a>
 
-                        <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="ti ti-lifebuoy me-1 fs-17 align-middle"></i>
-                            <span class="align-middle">Support</span>
-                        </a>
+                    <!-- item-->
+                    <a href="javascript:void(0);" class="dropdown-item">
+                        <i class="ti ti-lifebuoy me-1 fs-17 align-middle"></i>
+                        <span class="align-middle">Support</span>
+                    </a>
 
-                        <div class="dropdown-divider"></div>
+                    <div class="dropdown-divider"></div>
 
-                        <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item active fw-semibold text-danger"
-                            id="topbar-logout-btn">
-                            <i class="ti ti-logout me-1 fs-17 align-middle"></i>
-                            <span class="align-middle">Sign Out</span>
-                        </a>
-                    </div>
+                    <!-- item-->
+                    <a href="javascript:void(0);" class="dropdown-item active fw-semibold text-danger"
+                        id="topbar-logout-btn">
+                        <i class="ti ti-logout me-1 fs-17 align-middle"></i>
+                        <span class="align-middle">Sign Out</span>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </header>
 <!-- Topbar End -->
-
-<!-- Search Modal -->
-<div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content bg-transparent">
-            <form>
-                <div class="card mb-1">
-                    <div class="px-3 py-2 d-flex flex-row align-items-center" id="top-search">
-                        <i class="ti ti-search fs-22"></i>
-                        <input type="search" class="form-control border-0" id="search-modal-input"
-                            placeholder="Search for actions, people,">
-                        <button type="submit" class="btn p-0" data-bs-dismiss="modal" aria-label="Close">[esc]</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <!-- Include JWT Auth utility -->
 <script src="{% static '/js/utils/jwt-auth.js' %}"></script>

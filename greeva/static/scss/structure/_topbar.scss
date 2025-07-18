@@ -13,7 +13,7 @@ Topbar CSS
     box-shadow: var(--#{$prefix}box-shadow);
     background: $topbar-bg;
     min-height: $topbar-height;
-    margin-left: $sidenav-width;
+    // margin-left: $sidenav-width;
     transition: $transition-base;
     border-bottom: $card-border-width solid $card-border-color;
     padding: 0 calc($grid-gutter-width * 0.5);
@@ -74,7 +74,7 @@ Topbar CSS
     }
 }
 
-// Topbar light/Dark Mode icon 
+// Topbar light/Dark Mode icon
 html[data-bs-theme="dark"] {
     #light-dark-mode {
         .ti-moon {

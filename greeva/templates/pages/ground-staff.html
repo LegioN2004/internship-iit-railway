@@ -2,15 +2,43 @@
 
 {% load static i18n %}
 
-{% block title %}Grid Js Tables{% endblock title %}
-
 {% block extra_css %}
 <link rel="stylesheet" href="{% static '/vendor/gridjs/theme/mermaid.min.css' %}">
+<style>
+    /* Override any remaining sidebar spacing */
+    .app-topbar,
+    .page-content,
+    .page-container,
+    .wrapper {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Hide sidenav completely */
+    .sidenav-menu,
+    .side-nav {
+        display: none !important;
+        width: 0 !important;
+    }
+
+    /* Make content full width */
+    body,
+    html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+
+    .container,
+    .container-fluid,
+    .page-container {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+</style>
 {% endblock extra_css %}
 
-{% block page_title %}
-{% include 'partials/page-title.html' with title="Ground Staff" subtitle="Tables" %}
-{% endblock page_title %}
 
 {% block page_content %}
 
@@ -44,33 +72,37 @@
 <script src="{% static '/js/components/ground-staff-logic.js' %}"></script>
 
 <script>
-    // Debug authentication state
-    console.log("Ground-staff page loaded");
-    console.log("Token in localStorage:", localStorage.getItem("authToken"));
-    console.log("JWT_AUTH.isAuthenticated():", JWT_AUTH.isAuthenticated());
+    document.addEventListener('DOMContentLoaded', function () {
+        // Debug authentication state
+        console.log("Ground-staff page loaded");
+        console.log("Token in localStorage:", localStorage.getItem("authToken"));
+        console.log("JWT_AUTH.isAuthenticated():", JWT_AUTH.isAuthenticated());
 
-    // Protect this page - redirect to login if not authenticated
-    const loginUrl = "{% url 'pages:dashboard' %}";
-    if (!JWT_AUTH.isAuthenticated()) {
-        console.log("Not authenticated, redirecting to login");
-        window.location.href = loginUrl;
-        return;
-    }
+        // Protect this page - redirect to login if not authenticated
+        const loginUrl = "{% url 'pages:dashboard' %}";
+        if (!JWT_AUTH.isAuthenticated()) {
+            console.log("Not authenticated, redirecting to login");
+            window.location.href = loginUrl;
+            return;
+        }
 
-    console.log("User is authenticated, proceeding with page load");
+        console.log("User is authenticated, proceeding with page load");
 
-    // date Format: 13/07/2025 (DD/MM/YYYY format)
-    function formatDate(date) {
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-    }
+        // date Format: 13/07/2025 (DD/MM/YYYY format)
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
 
-    // Set current date
-    const dateValueElement = document.getElementById('date-value');
-    const now = new Date();
-    dateValueElement.textContent = formatDate(now);
+        // Set current date
+        const dateValueElement = document.getElementById('date-value');
+        const now = new Date();
+        if (dateValueElement) {
+            dateValueElement.textContent = formatDate(now);
+        }
+    });
 </script>
 
 {% endblock extra_javascript %}
