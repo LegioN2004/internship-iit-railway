@@ -220,7 +220,7 @@
     <div class="auth-bg">
         <div class="card text-center">
             <a href="/" class="auth-brand mb-4 text-decoration-none">
-                <img src="{% static '/images/IITG_logo_dark.png' %}" alt="dark logo" class="logo-dark">
+                <img src="{% static '/images/IITG_logo_white.png' %}" alt="dark logo" class="logo-dark">
                 <h2>IIT Guwahati</h2>
             </a>
             <h4 class="fw-semibold mb-2 fs-18">Sign Up</h4>
@@ -303,10 +303,10 @@
                 <a href="{% url 'pages:dashboard' %}" class="fw-semibold text-danger ms-1">Login !</a>
             </p>
 
-                <p class="mt-3 mb-0">
-                    <script>document.write(new Date().getFullYear())</script> © <span
-                        class="fw-bold text-decoration-underline text-uppercase text-reset fs-15">IITG</span>
-                </p>
+            <p class="mt-3 mb-0">
+                <script>document.write(new Date().getFullYear())</script> © <span
+                    class="fw-bold text-decoration-underline text-uppercase text-reset fs-15">IITG</span>
+            </p>
 
         </div>
     </div>
@@ -471,7 +471,7 @@
             };
 
             try {
-                const response = await fetch("http://13.60.252.71:5000/signup", {
+                const response = await fetch("http://127.0.0.1:5000/signup", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

@@ -6,7 +6,7 @@ import requests
 import json
 
 def test_endpoints():
-    base_url = "http://13.60.252.71:5000"
+    base_url = "http://127.0.0.1:5000"
 
     print("Testing Flask Backend Endpoints...")
     print("=" * 50)
