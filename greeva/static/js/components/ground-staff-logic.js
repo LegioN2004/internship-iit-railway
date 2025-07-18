@@ -11,7 +11,7 @@ function dateTime() {
 }
 
 // Fetch trains data from the Flask backend with authentication
-JWT_AUTH.fetchWithAuth("http://127.0.0.1:5000/trains")
+JWT_AUTH.fetchWithAuth("http://13.60.252.71:5000/trains")
   .then((res) => res.json())
   .then((data) => {
     // Set station name in the card header if available
@@ -195,7 +195,7 @@ JWT_AUTH.fetchWithAuth("http://127.0.0.1:5000/trains")
         return;
       }
       // Send PATCH request to backend using report_id
-      JWT_AUTH.fetchWithAuth(`http://127.0.0.1:5000/trains/${reportId}`, {
+      JWT_AUTH.fetchWithAuth(`http://13.60.252.71:5000/trains/${reportId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newName }),
@@ -241,7 +241,7 @@ JWT_AUTH.fetchWithAuth("http://127.0.0.1:5000/trains")
 const urlParams = new URLSearchParams(window.location.search);
 const trainId = urlParams.get("id");
 if (trainId) {
-  fetch(`http://127.0.0.1:5000/train-report?id=${trainId}`, {
+  fetch(`http://13.60.252.71:5000/train-report?id=${trainId}`, {
     headers: {
       Authorization: "Bearer " + localStorage.getItem("authToken"),
     },
