@@ -23,7 +23,7 @@ greeva/
 
 ### 1. **Main Train List** (`tables-gridjs.html`)
 - Displays all trains in a grid
-- Fetches data from Flask API (`http://13.60.252.71:5000/trains`)
+- Fetches data from Flask API (`http://127.0.0.1:5000/trains`)
 - **Status buttons** (Finished/Unfinished) redirect to train-report page
 - Uses `train-grid.js` for logic
 
