@@ -136,7 +136,7 @@ def create_signup():
         }), 400
 
     if Signup.query.filter_by(Ph_No=phone).first():
-        return jsonify({'error': 'Phone number already registered.'}), 409
+        return jsonify({'error': 'This phone number is already registered. Please log in or use a different number.'}), 409
 
     hashed_password = hash_password_sha1(password)
 
@@ -169,7 +169,7 @@ def create_signup():
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': f"Signup failed: {str(e)}"}), 500
+        return jsonify({'error': 'Signup failed due to a server error. Please try again later or contact support.'}), 500
 
 # ------------------- LOGIN -------------------
 

@@ -1,0 +1,628 @@
+{% extends 'vertical.html' %}
+{% load static %}
+
+{% block title %}Calendar{% endblock title %}
+
+{% block extra_css %}
+<link href="{% static 'vendor/fullcalendar/index.global.min.css' %}" rel="stylesheet">
+<style>
+    .time-period-btn {
+        transition: all 0.3s ease;
+    }
+
+    .time-period-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .time-period-btn.active {
+        background-color: #556ee6 !important;
+        border-color: #556ee6 !important;
+        color: white !important;
+    }
+
+    /* Force all FullCalendar buttons to be blue */
+    .fc .fc-button {
+        background-color: #007bff !important;
+        border-color: #007bff !important;
+        color: white !important;
+        box-shadow: none !important;
+    }
+
+    .fc .fc-button:hover,
+    .fc .fc-button:focus,
+    .fc .fc-button:active,
+    .fc .fc-button.fc-button-active,
+    .fc .fc-button:not(:disabled):active,
+    .fc .fc-button:not(:disabled).active {
+        background-color: #0056b3 !important;
+        border-color: #0056b3 !important;
+        color: white !important;
+        box-shadow: none !important;
+    }
+
+    .fc .fc-button:disabled {
+        background-color: #6c757d !important;
+        border-color: #6c757d !important;
+        color: white !important;
+        opacity: 0.65 !important;
+    }
+
+    /* Target all possible button states */
+    .fc .fc-toolbar-chunk .fc-button-group .fc-button,
+    .fc .fc-toolbar .fc-button,
+    .fc-direction-ltr .fc-toolbar>*>.fc-button,
+    button.fc-button,
+    .fc-button.fc-button-primary {
+        background-color: #007bff !important;
+        border-color: #007bff !important;
+        color: white !important;
+    }
+
+    .fc .fc-toolbar-chunk .fc-button-group .fc-button:hover,
+    .fc .fc-toolbar .fc-button:hover,
+    .fc-direction-ltr .fc-toolbar>*>.fc-button:hover,
+    button.fc-button:hover,
+    .fc-button.fc-button-primary:hover {
+        background-color: #0056b3 !important;
+        border-color: #0056b3 !important;
+        color: white !important;
+    }
+
+    /* More comprehensive targeting for all FullCalendar buttons */
+    .fc .fc-button,
+    .fc-button,
+    button.fc-button,
+    .fc .fc-toolbar button,
+    .fc-header-toolbar .fc-button,
+    #calendar .fc-button,
+    #calendar .fc-toolbar-chunk .fc-button {
+        background-color: #007bff !important;
+        border-color: #007bff !important;
+        color: white !important;
+        background-image: none !important;
+    }
+
+    .fc .fc-button:hover,
+    .fc-button:hover,
+    button.fc-button:hover,
+    .fc .fc-toolbar button:hover,
+    .fc-header-toolbar .fc-button:hover,
+    #calendar .fc-button:hover,
+    #calendar .fc-toolbar-chunk .fc-button:hover,
+    .fc .fc-button:focus,
+    .fc-button:focus,
+    button.fc-button:focus,
+    .fc .fc-toolbar button:focus,
+    .fc-header-toolbar .fc-button:focus,
+    #calendar .fc-button:focus,
+    #calendar .fc-toolbar-chunk .fc-button:focus,
+    .fc .fc-button:active,
+    .fc-button:active,
+    button.fc-button:active,
+    .fc .fc-toolbar button:active,
+    .fc-header-toolbar .fc-button:active,
+    #calendar .fc-button:active,
+    #calendar .fc-toolbar-chunk .fc-button:active,
+    .fc .fc-button.fc-button-active,
+    .fc-button.fc-button-active,
+    button.fc-button.fc-button-active,
+    .fc .fc-toolbar button.fc-button-active,
+    .fc-header-toolbar .fc-button.fc-button-active,
+    #calendar .fc-button.fc-button-active,
+    #calendar .fc-toolbar-chunk .fc-button.fc-button-active {
+        background-color: #0056b3 !important;
+        border-color: #0056b3 !important;
+        color: white !important;
+        background-image: none !important;
+    }
+</style>
+{% endblock extra_css %}
+
+{% block page_title %}
+{% include 'partials/page-title.html' with title="Calendar" %}
+{% endblock page_title %}
+
+{% block page_content %}
+<div class="row">
+    <div class="col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <button class="btn btn-primary w-100" id="btn-new-event">
+                    <i class="ti ti-plus me-2 align-middle"></i> Create New Train Status
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-9">
+        <div class="card">
+            <div class="card-body">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock page_content %}
+
+{% block modal %}
+<div class="modal fade" id="event-modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form class="needs-validation" name="event-form" id="forms-event" novalidate>
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modal-title">Add/Edit Train Event</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="event-alerts" class="form-label">Number of Alerts</label>
+                        <input type="number" class="form-control" id="event-alerts" required min="0"
+                            placeholder="Enter number of alerts" />
+                        <div class="invalid-feedback">Please provide a valid number of alerts</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="event-pending" class="form-label">Number of Cases Pending</label>
+                        <input type="number" class="form-control" id="event-pending" required min="0"
+                            placeholder="Enter number of cases pending" />
+                        <div class="invalid-feedback">Please provide a valid number of cases pending</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="event-processed" class="form-label">Number of Cases Processed</label>
+                        <input type="number" class="form-control" id="event-processed" required min="0"
+                            placeholder="Enter number of cases processed" />
+                        <div class="invalid-feedback">Please provide a valid number of cases processed</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="event-remarks" class="form-label">Remarks</label>
+                        <select class="form-select" id="event-remarks">
+                            <option value="">Select Remark</option>
+                            <option value="Lock Broken">Lock Broken</option>
+                            <option value="Signal Failure">Signal Failure</option>
+                            <option value="Track Maintenance">Track Maintenance</option>
+                            <option value="Weather Delay">Weather Delay</option>
+                            <option value="Technical Issue">Technical Issue</option>
+                            <option value="Scheduled Maintenance">Scheduled Maintenance</option>
+                            <option value="Emergency">Emergency</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <button type="button" class="btn btn-danger" id="btn-delete-event">Delete</button>
+                        <button type="button" class="btn btn-light ms-auto" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="btn-save-event">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock modal %}
+
+{% block extra_javascript %}
+<script src="{% static 'vendor/fullcalendar/index.global.min.js' %}"></script>
+<link href="{% static 'vendor/fullcalendar/index.global.min.css' %}" rel="stylesheet">
+<script>
+    class CalendarSchedule {
+        constructor() {
+            this.body = document.body;
+            this.modal = new bootstrap.Modal(document.getElementById('event-modal'), { backdrop: 'static' });
+            this.calendar = document.getElementById('calendar');
+            this.formEvent = document.getElementById('forms-event');
+            this.btnNewEvent = document.getElementById('btn-new-event');
+            this.btnDeleteEvent = document.getElementById('btn-delete-event');
+            this.btnSaveEvent = document.getElementById('btn-save-event');
+            this.modalTitle = document.getElementById('modal-title'); this.calendarObj = null;
+            this.selectedEvent = null;
+            this.newEventData = null;
+            this.editingDate = null;
+        } onEventClick(info) {
+            this.formEvent?.reset();
+            this.formEvent.classList.remove('was-validated');
+            this.newEventData = null;
+            this.btnDeleteEvent.style.display = "block";
+            this.modalTitle.textContent = 'Edit Train Status';
+
+            this.selectedEvent = info.event;
+            this.editingDate = info.event.startStr;
+
+            // Get all events for this date
+            const allEvents = this.calendarObj.getEvents().filter(event =>
+                event.startStr === this.editingDate
+            );
+
+            // Initialize values
+            let alertsValue = '0';
+            let pendingValue = '0';
+            let processedValue = '0';
+            let remarksValue = '';
+            // Populate values from existing events
+            allEvents.forEach(event => {
+                const type = event.extendedProps.type;
+                if (type === 'alerts') {
+                    alertsValue = event.extendedProps.count || '0';
+                    remarksValue = event.extendedProps.remarks || remarksValue;
+                } else if (type === 'pending') {
+                    pendingValue = event.extendedProps.count || '0';
+                    remarksValue = event.extendedProps.remarks || remarksValue;
+                } else if (type === 'processed') {
+                    processedValue = event.extendedProps.count || '0';
+                    remarksValue = event.extendedProps.remarks || remarksValue;
+                }
+            });
+
+            // Set form values
+            document.getElementById('event-alerts').value = alertsValue;
+            document.getElementById('event-pending').value = pendingValue;
+            document.getElementById('event-processed').value = processedValue;
+            document.getElementById('event-remarks').value = remarksValue;
+
+            this.modal.show();
+        } onSelect(info) {
+            this.formEvent?.reset();
+            this.formEvent.classList.remove('was-validated');
+            this.selectedEvent = null;
+            this.editingDate = null;
+            this.newEventData = info;
+            this.btnDeleteEvent.style.display = "none";
+            this.modalTitle.textContent = 'Add New Train Status';
+
+            // Set default values for new events
+            document.getElementById('event-alerts').value = '0';
+            document.getElementById('event-pending').value = '0';
+            document.getElementById('event-processed').value = '0';
+            document.getElementById('event-remarks').value = '';
+
+            this.modal.show();
+            this.calendarObj.unselect();
+        } init() {
+            const self = this;
+            const defaultEvents = [
+                // July 1st - 3 separate boxes
+                {
+                    title: '15 Alerts',
+                    start: '2025-07-01',
+                    className: 'bg-primary',
+                    order: 1,
+                    extendedProps: {
+                        type: 'alerts',
+                        count: '15',
+                        time: '08:00',
+                        remarks: ''
+                    }
+                },
+                {
+                    title: '5 Cases Pending',
+                    start: '2025-07-01',
+                    className: 'bg-danger',
+                    order: 2,
+                    extendedProps: {
+                        type: 'pending',
+                        count: '5',
+                        time: '09:00',
+                        remarks: ''
+                    }
+                },
+                {
+                    title: '10 Cases Processed',
+                    start: '2025-07-01',
+                    className: 'bg-success',
+                    order: 3,
+                    extendedProps: {
+                        type: 'processed',
+                        count: '10',
+                        time: '10:00',
+                        remarks: ''
+                    }
+                },
+                // July 2nd - 3 separate boxes
+                {
+                    title: '8 Alerts',
+                    start: '2025-07-02',
+                    className: 'bg-primary',
+                    order: 1,
+                    extendedProps: {
+                        type: 'alerts',
+                        count: '8',
+                        time: '08:00',
+                        remarks: ''
+                    }
+                },
+                {
+                    title: '3 Cases Pending',
+                    start: '2025-07-02',
+                    className: 'bg-danger',
+                    order: 2,
+                    extendedProps: {
+                        type: 'pending',
+                        count: '3',
+                        time: '09:00',
+                        remarks: ''
+                    }
+                },
+                {
+                    title: '5 Cases Processed',
+                    start: '2025-07-02',
+                    className: 'bg-success',
+                    order: 3,
+                    extendedProps: {
+                        type: 'processed',
+                        count: '5',
+                        time: '10:00',
+                        remarks: ''
+                    }
+                },
+                // July 3rd - 3 separate boxes
+                {
+                    title: '12 Alerts',
+                    start: '2025-07-03',
+                    className: 'bg-primary',
+                    order: 1,
+                    extendedProps: {
+                        type: 'alerts',
+                        count: '12',
+                        time: '08:00',
+                        remarks: ''
+                    }
+                },
+                {
+                    title: '7 Cases Pending',
+                    start: '2025-07-03',
+                    className: 'bg-danger',
+                    order: 2,
+                    extendedProps: {
+                        type: 'pending',
+                        count: '7',
+                        time: '09:00',
+                        remarks: ''
+                    }
+                },
+                {
+                    title: '5 Cases Processed',
+                    start: '2025-07-03',
+                    className: 'bg-success',
+                    order: 3,
+                    extendedProps: {
+                        type: 'processed',
+                        count: '5',
+                        time: '10:00',
+                        remarks: ''
+                    }
+                },            // July 4th - 3 separate boxes
+                {
+                    title: '6 Alerts',
+                    start: '2025-07-04',
+                    className: 'bg-primary',
+                    order: 1,
+                    extendedProps: {
+                        type: 'alerts',
+                        count: '6',
+                        time: '08:00',
+                        remarks: ''
+                    }
+                },
+                {
+                    title: '2 Cases Pending',
+                    start: '2025-07-04',
+                    className: 'bg-danger',
+                    order: 2,
+                    extendedProps: {
+                        type: 'pending',
+                        count: '2',
+                        time: '09:00',
+                        remarks: ''
+                    }
+                },
+                {
+                    title: '4 Cases Processed',
+                    start: '2025-07-04',
+                    className: 'bg-success',
+                    order: 3,
+                    extendedProps: {
+                        type: 'processed',
+                        count: '4',
+                        time: '10:00',
+                        remarks: ''
+                    }
+                },
+                // July 5th - 3 separate boxes
+                {
+                    title: '20 Alerts',
+                    start: '2025-07-05',
+                    className: 'bg-primary',
+                    order: 1,
+                    extendedProps: {
+                        type: 'alerts',
+                        count: '20',
+                        time: '08:00',
+                        remarks: ''
+                    }
+                },
+                {
+                    title: '12 Cases Pending',
+                    start: '2025-07-05',
+                    className: 'bg-danger',
+                    order: 2,
+                    extendedProps: {
+                        type: 'pending',
+                        count: '12',
+                        time: '09:00',
+                        remarks: ''
+                    }
+                },
+                {
+                    title: '8 Cases Processed',
+                    start: '2025-07-05',
+                    className: 'bg-success',
+                    order: 3,
+                    extendedProps: {
+                        type: 'processed',
+                        count: '8',
+                        time: '10:00',
+                        remarks: ''
+                    }
+                }
+            ]; self.calendarObj = new FullCalendar.Calendar(self.calendar, {
+                initialView: 'dayGridMonth',
+                initialDate: new Date(),
+                height: window.innerHeight - 200,
+                headerToolbar: {
+                    left: 'prev,next todayCustom',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,multiMonthYear'
+                },
+                customButtons: {
+                    todayCustom: {
+                        text: 'Today',
+                        click: function () {
+                            self.calendarObj.today();
+                            self.calendarObj.gotoDate(new Date());
+                        }
+                    }
+                },
+                buttonText: {
+                    month: 'Month',
+                    week: 'Week',
+                    day: 'Day',
+                    year: 'Year'
+                },
+                nowIndicator: true,
+                now: new Date(),
+                views: {
+                    dayGridMonth: {
+                        buttonText: 'Month'
+                    },
+                    timeGridWeek: {
+                        buttonText: 'Week'
+                    },
+                    timeGridDay: {
+                        buttonText: 'Day'
+                    },
+                    multiMonthYear: {
+                        buttonText: 'Year',
+                        type: 'multiMonth',
+                        duration: { years: 1 },
+                        multiMonthMaxColumns: 3,
+                        multiMonthMinWidth: 350
+                    }
+                },
+                initialEvents: defaultEvents,
+                editable: true,
+                droppable: true,
+                selectable: true,
+                eventOrder: 'order',
+
+                dateClick: function (info) {
+                    self.onSelect(info);
+                }, eventClick: function (info) {
+                    self.onEventClick(info);
+                }
+            }); self.calendarObj.render();
+
+            // Track view changes for debugging
+            self.calendarObj.on('datesSet', function (info) {
+                console.log('Calendar view changed to:', info.view.type);
+                console.log('Current date range:', info.startStr, 'to', info.endStr);
+            });
+
+            self.btnNewEvent.addEventListener('click', function () {
+                self.onSelect({
+                    date: new Date(),
+                    allDay: true
+                });
+            }); self.formEvent?.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const form = self.formEvent;
+
+                if (form.checkValidity()) {
+                    const alerts = document.getElementById('event-alerts').value || '0';
+                    const pending = document.getElementById('event-pending').value || '0';
+                    const processed = document.getElementById('event-processed').value || '0';
+                    const remarks = document.getElementById('event-remarks').value || '';
+
+                    if (self.editingDate) {
+                        // Editing existing events - remove all events for this date first
+                        const existingEvents = self.calendarObj.getEvents().filter(event =>
+                            event.startStr === self.editingDate
+                        );
+                        existingEvents.forEach(event => event.remove());
+                    }
+
+                    // Determine the date to use
+                    const eventDate = self.editingDate || self.newEventData.date;
+                    // Create all three events
+                    const eventsToAdd = [
+                        {
+                            title: alerts + ' Alerts',
+                            start: eventDate,
+                            allDay: true,
+                            className: 'bg-primary',
+                            order: 1,
+                            extendedProps: {
+                                type: 'alerts',
+                                count: alerts,
+                                time: '08:00',
+                                remarks: remarks
+                            }
+                        },
+                        {
+                            title: pending + ' Cases Pending',
+                            start: eventDate,
+                            allDay: true,
+                            className: 'bg-danger',
+                            order: 2,
+                            extendedProps: {
+                                type: 'pending',
+                                count: pending,
+                                time: '09:00',
+                                remarks: remarks
+                            }
+                        },
+                        {
+                            title: processed + ' Cases Processed',
+                            start: eventDate,
+                            allDay: true,
+                            className: 'bg-success',
+                            order: 3,
+                            extendedProps: {
+                                type: 'processed',
+                                count: processed,
+                                time: '10:00',
+                                remarks: remarks
+                            }
+                        }
+                    ];
+
+                    // Add all events
+                    eventsToAdd.forEach(eventData => {
+                        self.calendarObj.addEvent(eventData);
+                    });
+
+                    self.modal.hide();
+                } else {
+                    e.stopPropagation();
+                    form.classList.add('was-validated');
+                }
+            }); self.btnDeleteEvent.addEventListener('click', function () {
+                if (self.editingDate) {
+                    // Delete all events for this date
+                    const eventsToDelete = self.calendarObj.getEvents().filter(event =>
+                        event.startStr === self.editingDate
+                    );
+                    eventsToDelete.forEach(event => event.remove());
+                    self.editingDate = null;
+                    self.selectedEvent = null;
+                    self.modal.hide();
+                }
+            });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        new CalendarSchedule().init();
+    });
+</script>
+{% endblock extra_javascript %}

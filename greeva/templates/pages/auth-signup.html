@@ -220,7 +220,7 @@
     <div class="auth-bg">
         <div class="card text-center">
             <a href="/" class="auth-brand mb-4 text-decoration-none">
-                <img src="{% static '/images/IITG_logo_white.png' %}" alt="dark logo" class="logo-dark">
+                <img src="{% static '/images/IITG_logo_dark.png' %}" alt="dark logo" class="logo-dark">
                 <h2>IIT Guwahati</h2>
             </a>
             <h4 class="fw-semibold mb-2 fs-18">Sign Up</h4>
@@ -496,9 +496,24 @@
                     // Show success message
                     alert("Account created successfully! Redirecting...");
 
-                    // Small delay to show success message, then redirect
+                    // Redirect based on user type from backend
+                    const userType = data.user.Type_of_User;
+                    let redirectUrl;
+                    switch (userType) {
+                        case 'GroundStaff':
+                            redirectUrl = "{% url 'pages:dynamic_pages' template_name='ground-staff' %}";
+                            break;
+                        case 'StationAdmin':
+                            redirectUrl = "{% url 'pages:dynamic_pages' template_name='station-admin' %}";
+                            break;
+                        case 'ZonalHead':
+                            redirectUrl = "{% url 'pages:dynamic_pages' template_name='zonal-head' %}";
+                            break;
+                        default:
+                            redirectUrl = "{% url 'pages:dynamic_pages' template_name='pages-404' %}";
+                    }
                     setTimeout(() => {
-                        window.location.href = "{% url 'pages:dynamic_pages' template_name='ground-staff' %}";
+                        window.location.href = redirectUrl;
                     }, 1500);
                 } else {
                     console.error("Signup failed:", data);
