@@ -85,10 +85,58 @@
 <script src="{% static '/js/utils/jwt-auth.js' %}"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Check if user is already logged in, redirect to ground-staff
+        // Check if user is already logged in, redirect based on user type
         if (JWT_AUTH.isAuthenticated()) {
-            window.location.href = "{% url 'pages:dynamic_pages' template_name='ground-staff' %}";
-            return;
+            // Try to get user type from JWT payload
+            let userType = null;
+            try {
+                const token = JWT_AUTH.getToken();
+                if (token) {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload && payload.user && payload.user.Type_of_User) {
+                        userType = payload.user.Type_of_User;
+                    }
+                }
+            } catch (e) { userType = null; }
+
+            // If not in JWT, fallback to /profile API
+            function redirectByUserType(type) {
+                let redirectUrl;
+                switch (type) {
+                    case 'GroundStaff':
+                        redirectUrl = "{% url 'pages:dynamic_pages' template_name='ground-staff' %}";
+                        break;
+                    case 'StationAdmin':
+                        redirectUrl = "{% url 'pages:dynamic_pages' template_name='station-admin' %}";
+                        break;
+                    case 'ZonalHead':
+                        redirectUrl = "{% url 'pages:dynamic_pages' template_name='zonal-head' %}";
+                        break;
+                    default:
+                        redirectUrl = "{% url 'pages:dynamic_pages' template_name='pages-404' %}";
+                }
+                window.location.href = redirectUrl;
+            }
+
+            if (userType) {
+                redirectByUserType(userType);
+                return;
+            } else {
+                // Fallback: fetch user profile from backend
+                JWT_AUTH.fetchWithAuth("http://127.0.0.1:5000/profile")
+                    .then(res => res && res.json ? res.json() : null)
+                    .then(data => {
+                        if (data && data.user && data.user.Type_of_User) {
+                            redirectByUserType(data.user.Type_of_User);
+                        } else {
+                            window.location.href = "{% url 'pages:dynamic_pages' template_name='ground-staff' %}";
+                        }
+                    })
+                    .catch(() => {
+                        window.location.href = "{% url 'pages:dynamic_pages' template_name='ground-staff' %}";
+                    });
+                return;
+            }
         }
 
         const form = document.getElementById("loginForm");
@@ -285,14 +333,13 @@
                                 redirectUrl = "{% url 'pages:dynamic_pages' template_name='ground-staff' %}";
                                 break;
                             case 'StationAdmin':
-                                redirectUrl = "{% url 'pages:dynamic_pages' template_name='station-admin' %}"; // or station-admin page
+                                redirectUrl = "{% url 'pages:dynamic_pages' template_name='station-admin' %}";
                                 break;
                             case 'ZonalHead':
-                                redirectUrl = "{% url 'pages:dynamic_pages' template_name='zonal-head' %}"; // or station-admin page
-                                // redirectUrl = "{% url 'pages:dynamic_pages' template_name='ground-staff' %}"; // or zonal-head page
+                                redirectUrl = "{% url 'pages:dynamic_pages' template_name='zonal-head' %}";
                                 break;
                             default:
-                                redirectUrl = "{% url 'pages:dynamic_pages' template_name='page-404' %}";
+                                redirectUrl = "{% url 'pages:dynamic_pages' template_name='pages-404' %}";
                         }
 
                         // Small delay to show success message, then redirect

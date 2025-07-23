@@ -2,34 +2,15 @@
 
 {% load static %}
 
-{% block title %}Dashboard{% endblock title %}
+{% include 'partials/topbar-station-admin.html' %}
+{% include 'partials/sidenav-station-admin.html' %}
+
 {% block extra_css %}
-
-<style>
-  .gridjs .gridjs-pagination .gridjs-pages button.gridjs-currentPage {
-    background-color: #0d6efd !important;
-    color: white !important;
-    border-color: #0d6efd !important;
-  }
-</style>
-<style>
-  /* Fix overlap of Grid.js search icon and input text */
-  .gridjs .gridjs-search input {
-    padding-left: 2rem !important;
-    /* Add spacing between icon and text */
-  }
-
-  .gridjs .gridjs-search svg {
-    left: 0.6rem !important;
-    /* Move icon slightly right */
-  }
-</style>
-
 <link href="{% static '/vendor/jsvectormap/jsvectormap.min.css' %}" rel="stylesheet" type="text/css">
 {% endblock extra_css %}
 
 {% block page_title %}
-{% include 'partials/station-admin/page-title.html' with title="Station Admin Page" %}
+{% include 'partials/page-title-station-admin.html' with title="Station Admin Page" %}
 {% endblock page_title %}
 
 {% block page_content %}
@@ -203,7 +184,7 @@
 
   // Load data from backend and update table
   function loadTrainReportTable() {
-    fetch("http://127.0.0.1:5001/train-report/week")
+    fetch("http://127.0.0.1:5000/train-report/week")
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -270,30 +251,30 @@
     // 🌐 Choose the correct Flask endpoint
     if (cardType === 'finished') {
       if (period === 'This week') {
-        url = 'http://127.0.0.1:5001/report-summary/weekly';
+        url = 'http://127.0.0.1:5000/report-summary/weekly';
         field = 'Week';
       } else if (period === 'This month') {
-        url = 'http://127.0.0.1:5001/report-summary/monthly';
+        url = 'http://127.0.0.1:5000/report-summary/monthly';
         field = 'Month';
       } else {
-        url = 'http://127.0.0.1:5001/report-summary/yearly';
+        url = 'http://127.0.0.1:5000/report-summary/yearly';
         field = 'Year';
       }
     }
 
     if (cardType === 'alerts') {
-      url = 'http://127.0.0.1:5001/reports/by-week';  // No month/year endpoint in backend right now
+      url = 'http://127.0.0.1:5000/reports/by-week';  // No month/year endpoint in backend right now
     }
 
     if (cardType === 'cases') {
       if (period === 'This week') {
-        url = 'http://127.0.0.1:5001/cases/week';
+        url = 'http://127.0.0.1:5000/cases/week';
         field = 'Week';
       } else if (period === 'This month') {
-        url = 'http://127.0.0.1:5001/cases/month';
+        url = 'http://127.0.0.1:5000/cases/month';
         field = 'Month';
       } else {
-        url = 'http://127.0.0.1:5001/cases/year';
+        url = 'http://127.0.0.1:5000/cases/year';
         field = 'Year';
       }
     }
@@ -386,96 +367,12 @@
 
 <!-- Grid.js Table Rendering -->
 <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+<script src="{% static '/js/utils/jwt-auth.js' %}"></script>
 <script>
-  // Simple handleRemarksInput function for inline editing
-  function handleRemarksInput(element) {
-    const currentText = element.innerText === "Click to add" ? "" : element.innerText;
-    const input = prompt("Enter remark:", currentText);
-    if (input !== null) {
-      element.innerText = input;
+  document.addEventListener('DOMContentLoaded', function () {
+    if (!JWT_AUTH.isAuthenticated()) {
+      window.location.href = "{% url 'pages:dynamic_pages' template_name='auth-login' %}";
     }
-  }
-
-  function loadTrainReportTable() {
-    fetch("http://127.0.0.1:5001/train-report/week")
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(result => {
-        if (result.status === "success" && result.data) {
-          const formattedData = result.data.map(row => [
-            row.Date || "-",
-            row.Train_Status || "-",
-            row.Train_Name || "-",
-            row.Time || "-",
-            row.Remarks || "<i>Click to add</i>",
-            "" // checkbox placeholder
-          ]);
-
-          new gridjs.Grid({
-            columns: [
-              {
-                name: 'Date',
-                width: '100px',
-                formatter: cell => gridjs.html('<span class="fw-semibold">' + cell + '</span>')
-              },
-              { name: 'Status', width: '180px' },
-              {
-                name: 'Train Name',
-                width: '200px',
-                formatter: cell => gridjs.html(`<a href="">${cell}</a>`)
-              },
-              { name: 'Time', width: '130px' },
-              {
-                name: 'Remarks',
-                width: '180px',
-                formatter: (cell) => gridjs.html(`
-                <span style="cursor: pointer;" onclick="handleRemarksInput(this)">
-                  ${cell}
-                </span>
-              `)
-              },
-              {
-                name: 'Generate a case',
-                width: '150px',
-                formatter: () => gridjs.html('<input type="checkbox" />')
-              }
-            ],
-            data: formattedData,
-            pagination: {
-              limit: 5
-            },
-            sort: true,
-            search: true
-          }).render(document.getElementById("table-gridjs"));
-        })
-      .catch(error => {
-        console.error("Fetch error:", error);
-        // Show empty table with error message
-        new gridjs.Grid({
-          columns: [
-            { name: 'Date', width: '100px' },
-            { name: 'Status', width: '180px' },
-            { name: 'Train Name', width: '200px' },
-            { name: 'Time', width: '130px' },
-            { name: 'Remarks', width: '180px' },
-            { name: 'Generate a case', width: '150px' }
-          ],
-          data: [["Error loading data", "", "", "", "", ""]],
-          pagination: { limit: 5 },
-          sort: true,
-          search: true
-        }).render(document.getElementById("table-gridjs"));
-      });
-  }
-
-  // Call on page load
-  document.addEventListener("DOMContentLoaded", function () {
-    loadTrainReportTable();
   });
 </script>
-
 {% endblock extra_javascript %}

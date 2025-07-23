@@ -245,17 +245,7 @@
                     <label class="form-label" for="station-name">Station Name</label>
                     <select id="station-name" name="station-name" class="form-control">
                         <option value="">Select Station</option>
-                        <option value="STN001">Station 1</option>
-                        <option value="STN002">Station 2</option>
-                        <option value="STN003">Station 3</option>
-                        <option value="STN004">Station 4</option>
-                        <option value="STN005">Station 5</option>
-                        <option value="STN006">Station 6</option>
-                        <option value="STN007">Station 7</option>
-                        <option value="STN008">Station 8</option>
-                        <option value="STN009">Station 9</option>
-                        <option value="STN0011">Station 11</option>
-                        <option value="STN0021">Station 21</option>
+                        <!-- Stations will be populated by JS -->
                     </select>
                 </div>
                 <div class="mb-3">
@@ -317,6 +307,33 @@
 <script>
 
     document.addEventListener("DOMContentLoaded", function () {
+        // Dynamically populate stations
+        const stationSelect = document.getElementById("station-name");
+        fetch("http://127.0.0.1:5000/stations")
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success" && Array.isArray(data.stations)) {
+                    data.stations.forEach(station => {
+                        const opt = document.createElement("option");
+                        opt.value = station.Station_Code;
+                        opt.textContent = `${station.Station_Name} (${station.Station_Code}) - ${station.zone}`;
+                        stationSelect.appendChild(opt);
+                    });
+                }
+            });
+
+        // Hide station dropdown if Zonal Head is selected
+        const userTypeSelect = document.getElementById("user-type");
+        const stationDiv = stationSelect.closest(".mb-3");
+        function toggleStationDropdown() {
+            if (userTypeSelect.value === "ZonalHead") {
+                stationDiv.style.display = "none";
+            } else {
+                stationDiv.style.display = "";
+            }
+        }
+        userTypeSelect.addEventListener("change", toggleStationDropdown);
+        toggleStationDropdown();
         const phoneInput = document.getElementById("example-phone");
         const passwordInput = document.getElementById("example-password");
         const confirmPasswordInput = document.getElementById("confirm-password");

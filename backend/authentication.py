@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import hashlib
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date, time
 from functools import wraps
 import re
 
@@ -39,6 +39,21 @@ def is_valid_password(password):
     if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
         return False
     return True
+
+def serialize_result(rows):
+    """
+    Serializes database results, converting special types to strings.
+    Handles datetime objects and byte arrays.
+    """
+    for row in rows:
+        for key in row:
+            # Convert date, time, and timedelta objects to string format
+            if isinstance(row[key], (datetime, date, time, timedelta)):
+                row[key] = str(row[key])
+            # Convert byte arrays (like from BLOBs or certain string types) to UTF-8 strings
+            elif isinstance(row[key], (bytes, bytearray)):
+                row[key] = row[key].decode('utf-8')
+    return rows
 
 # ------------------- TOKEN VALIDATOR -------------------
 
@@ -81,19 +96,28 @@ class Station(db.Model):
     SI_No = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Station_Name = db.Column(db.String(100))
     Station_Code = db.Column(db.String(20), unique=True)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    zone = db.Column(db.String(100))
 
     def to_dict(self):
         return {
             'SI_No': self.SI_No,
             'Station_Name': self.Station_Name,
-            'Station_Code': self.Station_Code
+            'Station_Code': self.Station_Code,
+            'latitude': self.latitude,
+            'longitude': self.longitude,
+            'zone': self.zone
         }
 
 
-@app.route('/stations')
+@app.route('/stations', methods=['GET'])
 def show_stations():
     stations = Station.query.all()
-    return jsonify([station.to_dict() for station in stations])
+    return jsonify({
+        'status': 'success',
+        'stations': [station.to_dict() for station in stations]
+    }), 200
 
 # ------------------- SIGNUP -------------------
 
@@ -259,9 +283,6 @@ def profile(current_user):
         "user": current_user.to_dict()
     })
 
-# ------------------- TRAIN REPORT (PROTECTED) -------------------
-
-
 class Report(db.Model):
     __tablename__ = 'report'
     SI_No = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -298,6 +319,45 @@ class Report(db.Model):
             'Image_Link': self.Image_Link,
             'Ph_No': self.Ph_No
         }
+
+
+class FinalReport(db.Model):
+    __tablename__ = 'final_report'
+    SI_No = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    Train_Name = db.Column(db.String(50))
+    Date = db.Column(db.Date)
+    Time = db.Column(db.Time)
+    Status = db.Column(db.Boolean)
+    Report_Remark = db.Column(db.Text)
+    Case_ID = db.Column(db.Integer)
+
+    def to_dict(self):
+        return {
+            'SI_No': self.SI_No,
+            'Train_Name': self.Train_Name,
+            'Date': self.Date.isoformat() if self.Date else None,
+            'Time': self.Time.isoformat() if self.Time else None,
+            'Status': self.Status,
+            'Report_Remark': self.Report_Remark,
+            'Case_ID': self.Case_ID
+        }
+
+
+class PendingCases(db.Model):
+    __tablename__ = 'pending_cases'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    train = db.Column(db.String(50))
+    status = db.Column(db.String(20))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'train': self.train,
+            'status': self.status
+        }
+
+
+# ------------------- ROUTES -------------------
 
 
 
@@ -337,11 +397,262 @@ def update_train(current_user, report_id):
     db.session.commit()
     return jsonify({'success': True, 'updated_report': report.to_dict()})
 
+# ------------------- MERGED BACKEND ENDPOINTS -------------------
+
+@app.route('/train-report/week', methods=['GET'])
+def train_report_by_week():
+    try:
+        from sqlalchemy import text, func
+        # Use SQLAlchemy to execute raw SQL for complex queries
+        query = text("""
+            SELECT
+                WEEK(Date, 1) AS Week, Date, Time, Train_Name,
+                CASE WHEN Status = 1 THEN 'Finished' ELSE 'Pending' END AS Train_Status,
+                Report_Remark AS Remarks
+            FROM report ORDER BY Date DESC
+        """)
+        result = db.session.execute(query)
+        rows = [dict(row._mapping) for row in result]
+        return jsonify({"status": "success", "data": serialize_result(rows)})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/train-report/month', methods=['GET'])
+def train_report_by_month():
+    try:
+        from sqlalchemy import text
+        query = text("""
+            SELECT
+                MONTH(Date) AS Month, Date, Time, Train_Name,
+                CASE WHEN Status = 1 THEN 'Finished' ELSE 'Pending' END AS Train_Status,
+                Report_Remark AS Remarks
+            FROM report ORDER BY Date DESC
+        """)
+        result = db.session.execute(query)
+        rows = [dict(row._mapping) for row in result]
+        return jsonify({"status": "success", "data": serialize_result(rows)})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/train-report/year', methods=['GET'])
+def train_report_by_year():
+    try:
+        from sqlalchemy import text
+        query = text("""
+            SELECT
+                YEAR(Date) AS Year, Date, Time, Train_Name,
+                CASE WHEN Status = 1 THEN 'Finished' ELSE 'Pending' END AS Train_Status,
+                Report_Remark AS Remarks
+            FROM report ORDER BY Date DESC
+        """)
+        result = db.session.execute(query)
+        rows = [dict(row._mapping) for row in result]
+        return jsonify({"status": "success", "data": serialize_result(rows)})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/report-summary/weekly', methods=['GET'])
+def weekly_summary():
+    try:
+        from sqlalchemy import text
+        query = text("""
+            SELECT COUNT(*) AS Finished_Reports FROM final_report
+            WHERE Status = 1 AND YEARWEEK(Date, 1) = YEARWEEK(CURDATE(), 1)
+        """)
+        result = db.session.execute(query)
+        row = result.fetchone()
+        return jsonify({"status": "success", "data": dict(row._mapping)})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/report-summary/monthly', methods=['GET'])
+def monthly_summary():
+    try:
+        from sqlalchemy import text
+        query = text("""
+            SELECT COUNT(*) AS Finished_Reports FROM final_report
+            WHERE Status = 1 AND YEAR(Date) = YEAR(CURDATE()) AND MONTH(Date) = MONTH(CURDATE())
+        """)
+        result = db.session.execute(query)
+        row = result.fetchone()
+        return jsonify({"status": "success", "data": dict(row._mapping)})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/report-summary/yearly', methods=['GET'])
+def yearly_summary():
+    try:
+        from sqlalchemy import text
+        query = text("""
+            SELECT COUNT(*) AS Finished_Reports FROM final_report
+            WHERE Status = 1 AND YEAR(Date) = YEAR(CURDATE())
+        """)
+        result = db.session.execute(query)
+        row = result.fetchone()
+        return jsonify({"status": "success", "data": dict(row._mapping)})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/reports/by-week', methods=['GET'])
+def reports_by_week():
+    try:
+        from sqlalchemy import text
+        query = text("""
+            SELECT
+                WEEK(Date, 1) AS Week,
+                CASE WHEN Status = 1 THEN 'Finished' ELSE 'Unfinished' END AS Report_Status,
+                COUNT(*) AS Total_Reports
+            FROM final_report
+            GROUP BY WEEK(Date, 1), Status ORDER BY Week
+        """)
+        result = db.session.execute(query)
+        rows = [dict(row._mapping) for row in result]
+        return jsonify({"status": "success", "data": rows})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/update-remark', methods=['POST'])
+def update_remark():
+    try:
+        data = request.get_json()
+        date = data.get("Date")
+        train_name = data.get("Train_Name")
+        new_remark = data.get("Remarks")
+
+        if not (date and train_name):
+            return jsonify({"status": "error", "message": "Missing date or train name"}), 400
+
+        # Update using SQLAlchemy ORM
+        report = FinalReport.query.filter_by(Date=date, Train_Name=train_name).first()
+        if report:
+            report.Report_Remark = new_remark
+            db.session.commit()
+            return jsonify({"status": "success", "message": "Remark updated"})
+        else:
+            return jsonify({"status": "error", "message": "Report not found"}), 404
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/cases/month', methods=['GET'])
+def cases_by_month():
+    try:
+        from sqlalchemy import text
+        query = text("""
+        SELECT
+            SI_No,
+            DATE_FORMAT(Date, '%Y-%m-%d') AS Date,
+            Train_Name,
+            TIME_FORMAT(Time, '%h:%i %p') AS Time,
+            Case_ID,
+            Report_Remark AS Remarks,
+            CASE
+                WHEN Status = 1 THEN 'Closed'
+                WHEN Status = 0 THEN 'Open'
+                ELSE 'Unknown'
+            END AS Case_Status,
+            MONTH(Date) AS Month
+        FROM final_report
+        ORDER BY Month
+        """)
+        result = db.session.execute(query)
+        rows = [dict(row._mapping) for row in result]
+        return jsonify({"status": "success", "data": serialize_result(rows)})
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/cases/week', methods=['GET'])
+def cases_by_week():
+    try:
+        from sqlalchemy import text
+        query = text("""
+        SELECT
+            SI_No,
+            DATE_FORMAT(Date, '%Y-%m-%d') AS Date,
+            Train_Name,
+            TIME_FORMAT(Time, '%h:%i %p') AS Time,
+            Case_ID,
+            Report_Remark AS Remarks,
+            CASE
+                WHEN Status = 1 THEN 'Closed'
+                WHEN Status = 0 THEN 'Open'
+                ELSE 'Unknown'
+            END AS Case_Status,
+            WEEK(Date, 1) AS Week
+        FROM final_report
+        ORDER BY Week
+        """)
+        result = db.session.execute(query)
+        rows = [dict(row._mapping) for row in result]
+        return jsonify({"status": "success", "data": serialize_result(rows)})
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/cases/year', methods=['GET'])
+def cases_by_year():
+    try:
+        from sqlalchemy import text
+        query = text("""
+        SELECT
+            SI_No,
+            DATE_FORMAT(Date, '%Y-%m-%d') AS Date,
+            Train_Name,
+            TIME_FORMAT(Time, '%h:%i %p') AS Time,
+            Case_ID,
+            Report_Remark AS Remarks,
+            CASE
+                WHEN Status = 1 THEN 'Closed'
+                WHEN Status = 0 THEN 'Open'
+                ELSE 'Unknown'
+            END AS Case_Status,
+            YEAR(Date) AS Year
+        FROM final_report
+        ORDER BY Year
+        """)
+        result = db.session.execute(query)
+        rows = [dict(row._mapping) for row in result]
+        return jsonify({"status": "success", "data": serialize_result(rows)})
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/report-summary/daily', methods=['GET'])
+def report_summary_daily():
+    try:
+        from sqlalchemy import text
+        query = text("""
+        SELECT
+            DATE_FORMAT(Date, '%Y-%m-%d') AS Date,
+            SUM(CASE WHEN Status = 1 THEN 1 ELSE 0 END) AS Processed,
+            SUM(CASE WHEN Status = 0 THEN 1 ELSE 0 END) AS Pending
+        FROM final_report
+        GROUP BY Date
+        ORDER BY Date
+        """)
+        result = db.session.execute(query)
+        rows = [dict(row._mapping) for row in result]
+        return jsonify({"status": "success", "data": serialize_result(rows)})
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/pending')
+def get_pending():
+    try:
+        # Use SQLAlchemy ORM
+        pending_cases = PendingCases.query.all()
+        table_rows = [[case.id, case.status, case.train] for case in pending_cases]
+        return jsonify({'reports': table_rows})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 # ------------------- MAIN -------------------
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+    print("✅ All endpoints are now active - authentication and merged backend combined!")
     app.run(host='0.0.0.0', port=5000, debug=True)
-    # app.run(debug=True)

@@ -182,7 +182,7 @@ html[data-sidenav-size="condensed"]:not([data-layout="topnav"]) {
 
     .app-topbar {
         z-index: 1005;
-        // margin-left: $sidenav-width-sm;
+        margin-left: $sidenav-width-sm;
     }
 
     .page-content {
@@ -391,7 +391,7 @@ html[data-sidenav-size="compact"]:not([data-layout="topnav"]) {
 
     .page-content,
     .app-topbar {
-        // margin-left: $sidenav-width-md;
+        margin-left: $sidenav-width-md;
     }
 
     .menu-arrow,
@@ -405,7 +405,7 @@ html[data-sidenav-size="sm-hover"]:not([data-layout="topnav"]) {
 
     .page-content,
     .app-topbar {
-        // margin-left: $sidenav-width-sm;
+        margin-left: $sidenav-width-sm;
     }
 
     .sidenav-toggle-button {
@@ -551,7 +551,7 @@ html[data-sidenav-size="full"]:not([data-layout="topnav"]) {
 
     .page-content,
     .app-topbar {
-        // margin-left: 0;
+        margin-left: 0;
     }
 
     .button-close-fullsidebar {
@@ -586,7 +586,7 @@ html[data-sidenav-size="fullscreen"]:not([data-layout="topnav"]) {
 
     .page-content,
     .app-topbar {
-        // margin-left: 0;
+        margin-left: 0;
     }
 }
 
@@ -598,7 +598,7 @@ html[data-layout-mode="detached"]:not([data-layout="topnav"]) {
         margin: 0 auto;
 
         .app-topbar {
-            // margin: 0 -2.65%;
+            margin: 0 -2.65%;
             z-index: 1005;
 
             .logo {
@@ -648,7 +648,7 @@ html[data-layout-mode="detached"]:not([data-layout="topnav"]) {
             max-width: 100% !important;
 
             .app-topbar {
-                // margin: 0;
+                margin: 0;
                 padding: 0;
             }
         }

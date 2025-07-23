@@ -374,20 +374,52 @@
 </header>
 <!-- Topbar End -->
 
-<!-- Search Modal -->
-<div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content bg-transparent">
-            <form>
-                <div class="card mb-1">
-                    <div class="px-3 py-2 d-flex flex-row align-items-center" id="top-search">
-                        <i class="ti ti-search fs-22"></i>
-                        <input type="search" class="form-control border-0" id="search-modal-input"
-                            placeholder="Search for actions, people,">
-                        <button type="submit" class="btn p-0" data-bs-dismiss="modal" aria-label="Close">[esc]</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+<!-- Include JWT Auth utility -->
+<script src="{% static '/js/utils/jwt-auth.js' %}"></script>
+<script>
+    // Add logout functionality to topbar Sign Out button
+    document.addEventListener('DOMContentLoaded', function () {
+        const logoutBtn = document.getElementById('topbar-logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (confirm('Are you sure you want to sign out?')) {
+                    JWT_AUTH.removeToken();
+                    window.location.href = "{% url 'pages:dynamic_pages' template_name='index' %}";
+                }
+            });
+        }
+
+        // Set user info in topbar from JWT or profile API
+        function setTopbarUserInfo(user) {
+            if (!user) return;
+            const nameElem = document.getElementById('topbar-user-name');
+            const typeElem = document.getElementById('topbar-user-type');
+            if (nameElem) nameElem.textContent = user.Name || user.name || 'User';
+            if (typeElem) typeElem.textContent = user.Type_of_User || user.type_of_user || 'User';
+        }
+
+        // Try to get user info from JWT payload first
+        let user = null;
+        try {
+            const token = JWT_AUTH.getToken();
+            if (token) {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload && payload.user) {
+                    user = payload.user;
+                }
+            }
+        } catch (e) { }
+
+        // If not in JWT, fetch from /profile
+        if (!user) {
+            JWT_AUTH.fetchWithAuth('http://127.0.0.1:5000/profile')
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.user) setTopbarUserInfo(data.user);
+                });
+        } else {
+            setTopbarUserInfo(user);
+        }
+    });
+</script>

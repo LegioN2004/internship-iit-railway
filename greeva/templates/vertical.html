@@ -15,9 +15,19 @@
 {% block preloader %}{% endblock preloader %}
 
 <div class="wrapper">
+    <!-- Debug info -->
+    <!-- User type: {{ user_type }} -->
 
-    {# {% include 'partials/menu.html' %} #}
+    {% if user_type == "station-admin" %}
+    {% include 'partials/topbar-station-admin.html' %}
+    {% include 'partials/sidenav-station-admin.html' %}
+    {% elif user_type == "ground-staff" %}
+    {% include 'partials/topbar-ground-staff.html' %}
+    {% include 'partials/sidenav-ground-staff.html' %}
+    {% else %}
     {% include 'partials/topbar.html' %}
+    {% include 'partials/sidenav.html' %}
+    {% endif %}
 
     <div class="page-content" style="margin-left: 0 !important;">
 

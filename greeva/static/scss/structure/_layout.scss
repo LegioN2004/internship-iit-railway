@@ -13,7 +13,7 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    margin-left: 0; // Remove sidenav margin to use full width
+    margin-left: $sidenav-width;
     transition: $transition-base;
     min-height: calc(100vh - $topbar-height);
     padding: 0 calc($grid-gutter-width * 0.5);
@@ -134,7 +134,7 @@ html[data-topbar-color="dark"] {
     }
 }
 
-// Page Title
+// Page Title 
 .page-title-head {
     height: 40px;
     padding: 0 $spacer;

@@ -3,24 +3,16 @@
 <div class="sidenav-menu">
 
     <!-- Brand Logo -->
-    <a href="{% url 'pages:dashboard' %}" class="logo">
+    <a href="{% url 'pages:dynamic_pages' template_name='station-admin' %}" class="logo">
         <span class="logo-light">
             <span class="logo-lg">
-                <img src="{% static '/images/IITG_logo.png' %}" alt="IITG logo" style="width: 40px; height: 40px; margin-right: 5px;">
+                <img src="{% static '/images/IITG_logo_white.png' %}" alt="IITG logo"
+                    style="width: 40px; height: 40px; margin-right: 5px;">
                 <span class="text-white fw-bold">IITG</span>
             </span>
             <span class="logo-sm">
-                <img src="{% static '/images/IITG_logo.png' %}" alt="IITG small logo" style="width: 40px; height: 40px;">
-            </span>
-        </span>
-
-        <span class="logo-dark">
-            <span class="logo-lg">
-                <img src="{% static '/images/IITG_logo.png' %}" alt="IITG logo" style="width: 32px; height: 32px; margin-right: 10px;">
-                <span class="text-white fw-bold">IITG</span>
-            </span>
-            <span class="logo-sm">
-                <img src="{% static '/images/IITG_logo.png' %}" alt="IITG small logo" style="width: 28px; height: 28px;">
+                <img src="{% static '/images/IITG_logo_white.png' %}" alt="IITG small logo"
+                    style="width: 30px; height: 30px;">
             </span>
         </span>
     </a>
@@ -42,27 +34,27 @@
             <li class="side-nav-title">Navigation</li>
 
             <li class="side-nav-item">
-                <a href="{% url 'pages:dashboard' %}" class="side-nav-link">
-                    <span class="menu-icon"><i class="ti ti-home"></i></span>
-                    <span class="menu-text"> Station Admin Page </span>
+                <a href="{% url 'pages:dynamic_pages' template_name='station-admin' %}" class="side-nav-link">
+                    <span class="menu-icon"><i class="ti ti-dashboard"></i></span>
+                    <span class="menu-text"> Dashboard </span>
+                    <span class="badge bg-success rounded-pill">5</span>
                 </a>
             </li>
 
             <li class="side-nav-item">
-                <a href="{% url 'pages:dynamic_pages' template_name='calendar' %}" class="side-nav-link">
+                <a href="{% url 'pages:dynamic_pages' template_name='apps-calendar' %}" class="side-nav-link">
                     <span class="menu-icon"><i class="ti ti-calendar"></i></span>
                     <span class="menu-text"> Calendar </span>
                 </a>
             </li>
 
             <li class="side-nav-item">
-                <a href="{% url 'pages:dynamic_pages' template_name='apps-calendar' %}" class="side-nav-link">
-                    <span class="menu-icon"><i class="ti ti-dashboard"></i></span>
+                <a href="{% url 'pages:dynamic_pages' template_name='current-pending' %}" class="side-nav-link">
+                    <span class="menu-icon"><i class="ti ti-file-invoice"></i></span>
                     <span class="menu-text"> Current & Pending Cases </span>
                 </a>
             </li>
         </ul>
-
         <div class="clearfix"></div>
     </div>
 </div>
