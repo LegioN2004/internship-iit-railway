@@ -31,7 +31,7 @@ def dynamic_pages_view(request, template_name):
         'calendar': 'pages/station-admin/calendar.html',
         'current-pending': 'pages/station-admin/current-pending.html',
         #
-        'zonal-head': 'pages/zonal-head/index.html',
+        'zonal-head': 'pages/zonal-head/zonal-head.html',
         #
         'pages-404': 'pages/pages-404.html',
         # add more as needed

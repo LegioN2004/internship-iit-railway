@@ -272,11 +272,11 @@
         }
       })
       .catch(err => {
-        tableContainer.innerHTML = `<p>Fetch error: ${err}</p>`;
+        tableContainer.innerHTML = `<p>${err}</p>`;
       });
   }
 
-  fetchCases('month'); // Load default
+  fetchCases("week");
 
   dropdown.addEventListener('change', (e) => {
     fetchCases(e.target.value);

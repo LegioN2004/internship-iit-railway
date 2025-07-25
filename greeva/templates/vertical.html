@@ -24,6 +24,9 @@
     {% elif user_type == "ground-staff" %}
     {% include 'partials/topbar-ground-staff.html' %}
     {% include 'partials/sidenav-ground-staff.html' %}
+    {% elif user_type == "zonal-head" %}
+    {% include 'partials/topbar-ground-staff.html' %}
+    {% include 'partials/sidenav-ground-staff.html' %}
     {% else %}
     {% include 'partials/topbar.html' %}
     {% include 'partials/sidenav.html' %}

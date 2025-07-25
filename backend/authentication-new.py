@@ -1,4 +1,3 @@
-from sqlalchemy import text
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -434,26 +433,15 @@ def update_train(current_user, report_id):
 @app.route('/train-report/week', methods=['GET'])
 def train_report_by_week():
     try:
-        from sqlalchemy import text
+        from sqlalchemy import text, func
+        # Use SQLAlchemy to execute raw SQL for complex queries
         query = text("""
             SELECT
-                WEEK(Date, 1) AS Week,
-                Date,
-                Time,
-                Train_Name,
+                WEEK(Date, 1) AS Week, Date, Time, Train_Name,
                 CASE WHEN Status = 1 THEN 'Finished' ELSE 'Pending' END AS Train_Status,
                 Report_Remark AS Remarks
-            FROM report
-            ORDER BY Week;
+            FROM report ORDER BY Date DESC
         """)
-        # Use SQLAlchemy to execute raw SQL for complex queries
-        # query = text("""
-        #     SELECT
-        #         WEEK(Date, 1) AS Week, Date, Time, Train_Name,
-        #         CASE WHEN Status = 1 THEN 'Finished' ELSE 'Pending' END AS Train_Status,
-        #         Report_Remark AS Remarks
-        #     FROM report ORDER BY Date DESC
-        # """)
         result = db.session.execute(query)
         rows = [dict(row._mapping) for row in result]
         return jsonify({"status": "success", "data": serialize_result(rows)})
@@ -464,23 +452,12 @@ def train_report_by_week():
 def train_report_by_month():
     try:
         from sqlalchemy import text
-        # query = text("""
-        #     SELECT
-        #         MONTH(Date) AS Month, Date, Time, Train_Name,
-        #         CASE WHEN Status = 1 THEN 'Finished' ELSE 'Pending' END AS Train_Status,
-        #         Report_Remark AS Remarks
-        #     FROM report ORDER BY Date DESC
-        # """)
         query = text("""
             SELECT
-                MONTH(Date) AS Month,
-                Date,
-                Time,
-                Train_Name,
+                MONTH(Date) AS Month, Date, Time, Train_Name,
                 CASE WHEN Status = 1 THEN 'Finished' ELSE 'Pending' END AS Train_Status,
                 Report_Remark AS Remarks
-            FROM report
-            ORDER BY Month;
+            FROM report ORDER BY Date DESC
         """)
         result = db.session.execute(query)
         rows = [dict(row._mapping) for row in result]
@@ -492,23 +469,12 @@ def train_report_by_month():
 def train_report_by_year():
     try:
         from sqlalchemy import text
-        # query = text("""
-        #     SELECT
-        #         YEAR(Date) AS Year, Date, Time, Train_Name,
-        #         CASE WHEN Status = 1 THEN 'Finished' ELSE 'Pending' END AS Train_Status,
-        #         Report_Remark AS Remarks
-        #     FROM report ORDER BY Date DESC
-        # """)
         query = text("""
             SELECT
-                YEAR(Date) AS Year,
-                Date,
-                Time,
-                Train_Name,
+                YEAR(Date) AS Year, Date, Time, Train_Name,
                 CASE WHEN Status = 1 THEN 'Finished' ELSE 'Pending' END AS Train_Status,
                 Report_Remark AS Remarks
-            FROM report
-            ORDER BY Year;
+            FROM report ORDER BY Date DESC
         """)
         result = db.session.execute(query)
         rows = [dict(row._mapping) for row in result]
@@ -521,18 +487,12 @@ def weekly_summary():
     try:
         from sqlalchemy import text
         query = text("""
-            SELECT
-                YEAR(Date) AS Year,
-                WEEK(Date) AS Week,
-                COUNT(*) AS Finished_Reports
-            FROM report
-            WHERE Status = 1
-            GROUP BY YEAR(Date), WEEK(Date)
-            ORDER BY Year, Week;
+            SELECT COUNT(*) AS Finished_Reports FROM final_report
+            WHERE Status = 1 AND YEARWEEK(Date, 1) = YEARWEEK(CURDATE(), 1)
         """)
         result = db.session.execute(query)
-        rows = [dict(row._mapping) for row in result]
-        return jsonify({"status": "success", "data": rows})
+        row = result.fetchone()
+        return jsonify({"status": "success", "data": dict(row._mapping)})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
@@ -541,18 +501,12 @@ def monthly_summary():
     try:
         from sqlalchemy import text
         query = text("""
-            SELECT
-                YEAR(Date) AS Year,
-                MONTH(Date) AS Month,
-                COUNT(*) AS Finished_Reports
-            FROM report
-            WHERE Status = 1
-            GROUP BY YEAR(Date), MONTH(Date)
-            ORDER BY Year, Month;
+            SELECT COUNT(*) AS Finished_Reports FROM final_report
+            WHERE Status = 1 AND YEAR(Date) = YEAR(CURDATE()) AND MONTH(Date) = MONTH(CURDATE())
         """)
         result = db.session.execute(query)
-        rows = [dict(row._mapping) for row in result]
-        return jsonify({"status": "success", "data": rows})
+        row = result.fetchone()
+        return jsonify({"status": "success", "data": dict(row._mapping)})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
@@ -561,13 +515,26 @@ def yearly_summary():
     try:
         from sqlalchemy import text
         query = text("""
+            SELECT COUNT(*) AS Finished_Reports FROM final_report
+            WHERE Status = 1 AND YEAR(Date) = YEAR(CURDATE())
+        """)
+        result = db.session.execute(query)
+        row = result.fetchone()
+        return jsonify({"status": "success", "data": dict(row._mapping)})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/reports/by-week', methods=['GET'])
+def reports_by_week():
+    try:
+        from sqlalchemy import text
+        query = text("""
             SELECT
-                YEAR(Date) AS Year,
-                COUNT(*) AS Finished_Reports
-            FROM report
-            WHERE Status = 1
-            GROUP BY YEAR(Date)
-            ORDER BY Year;
+                WEEK(Date, 1) AS Week,
+                CASE WHEN Status = 1 THEN 'Finished' ELSE 'Unfinished' END AS Report_Status,
+                COUNT(*) AS Total_Reports
+            FROM final_report
+            GROUP BY WEEK(Date, 1), Status ORDER BY Week
         """)
         result = db.session.execute(query)
         rows = [dict(row._mapping) for row in result]
@@ -575,108 +542,85 @@ def yearly_summary():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
+@app.route('/update-remark', methods=['POST'])
+def update_remark():
+    try:
+        data = request.get_json()
+        date = data.get("Date")
+        train_name = data.get("Train_Name")
+        new_remark = data.get("Remarks")
 
-# @app.route('/cases/<string:period>', methods=['GET'])
-# def get_cases_by_period(period):
-#     """
-#     Fetches cases by the specified period (week, month, year) using SQLAlchemy.
-#     """
-#     try:
+        if not (date and train_name):
+            return jsonify({"status": "error", "message": "Missing date or train name"}), 400
 
-#         base_query = """
-#             SELECT
-#                 SI_No,
-#                 DATE_FORMAT(Date, '%%Y-%%m-%%d') AS Date,
-#                 Train_Name,
-#                 TIME_FORMAT(Time, '%%h:%%i %%p') AS Time,
-#                 Case_ID,
-#                 Report_Remark AS Remarks,
-#                 CASE
-#                     WHEN Status = 1 THEN 'Closed'
-#                     WHEN Status = 0 THEN 'Open'
-#                     ELSE 'Unknown'
-#                 END AS Case_Status
-#             FROM final_report
-#         """
+        # Update using SQLAlchemy ORM
+        report = FinalReport.query.filter_by(Date=date, Train_Name=train_name).first()
+        if report:
+            report.Report_Remark = new_remark
+            db.session.commit()
+            return jsonify({"status": "success", "message": "Remark updated"})
+        else:
+            return jsonify({"status": "error", "message": "Report not found"}), 404
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"status": "error", "message": str(e)})
 
-#         # Dynamically add the correct WHERE clause to filter the data
-#         if period == 'week':
-#             base_query += " WHERE YEARWEEK(Date, 1) = YEARWEEK(CURDATE(), 1)"
-#         elif period == 'month':
-#             base_query += " WHERE YEAR(Date) = YEAR(CURDATE()) AND MONTH(Date) = MONTH(CURDATE())"
-#         elif period == 'year':
-#             base_query += " WHERE YEAR(Date) = YEAR(CURDATE())"
-#         else:
-#             return jsonify({"status": "error", "message": "Invalid period specified"}), 400
+@app.route('/cases/month', methods=['GET'])
+def cases_by_month():
+    try:
+        from sqlalchemy import text
+        query = text("""
+        SELECT
+            SI_No,
+            DATE_FORMAT(Date, '%Y-%m-%d') AS Date,
+            Train_Name,
+            TIME_FORMAT(Time, '%h:%i %p') AS Time,
+            Case_ID,
+            Report_Remark AS Remarks,
+            CASE
+                WHEN Status = 1 THEN 'Closed'
+                WHEN Status = 0 THEN 'Open'
+                ELSE 'Unknown'
+            END AS Case_Status,
+            MONTH(Date) AS Month
+        FROM final_report
+        ORDER BY Month
+        """)
+        result = db.session.execute(query)
+        rows = [dict(row._mapping) for row in result]
+        return jsonify({"status": "success", "data": serialize_result(rows)})
 
-#         base_query += " ORDER BY Date DESC, Time DESC;"
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
 
-#         query = text(base_query)
-#         result = db.session.execute(query)
-#         rows = [dict(row._mapping) for row in result]
-#         return jsonify({"status": "success", "data": serialize_result(rows)})
-
-#     except Exception as e:
-#         return jsonify({"status": "error", "message": str(e)})
-
-
-# Cases completed/initiated by week
 @app.route('/cases/week', methods=['GET'])
 def cases_by_week():
     try:
         from sqlalchemy import text
         query = text("""
-            SELECT
-                SI_No,
-                DATE_FORMAT(Date, '%Y-%m-%d') AS Date,
-                Train_Name,
-                TIME_FORMAT(Time, '%h:%i %p') AS Time,
-                Case_ID,
-                Report_Remark AS Remarks,
-                CASE
-                    WHEN Status = 1 THEN 'Closed'
-                    WHEN Status = 0 THEN 'Open'
-                    ELSE 'Unknown'
-                END AS Case_Status,
-                WEEK(Date, 1) AS Week
-            FROM final_report
-            ORDER BY Week;
+        SELECT
+            SI_No,
+            DATE_FORMAT(Date, '%Y-%m-%d') AS Date,
+            Train_Name,
+            TIME_FORMAT(Time, '%h:%i %p') AS Time,
+            Case_ID,
+            Report_Remark AS Remarks,
+            CASE
+                WHEN Status = 1 THEN 'Closed'
+                WHEN Status = 0 THEN 'Open'
+                ELSE 'Unknown'
+            END AS Case_Status,
+            WEEK(Date, 1) AS Week
+        FROM final_report
+        ORDER BY Week
         """)
         result = db.session.execute(query)
         rows = [dict(row._mapping) for row in result]
-        return jsonify({"status": "success", "data": rows})
+        return jsonify({"status": "success", "data": serialize_result(rows)})
+
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
-# Cases completed/initiated by month
-@app.route('/cases/month', methods=['GET'])
-def cases_by_month_by():
-    try:
-        from sqlalchemy import text
-        query = text("""
-            SELECT
-                SI_No,
-                DATE_FORMAT(Date, '%Y-%m-%d') AS Date,
-                Train_Name,
-                TIME_FORMAT(Time, '%h:%i %p') AS Time,
-                Case_ID,
-                Report_Remark AS Remarks,
-                CASE
-                    WHEN Status = 1 THEN 'Closed'
-                    WHEN Status = 0 THEN 'Open'
-                    ELSE 'Unknown'
-                END AS Case_Status,
-                MONTH(Date) AS Month
-            FROM final_report
-            ORDER BY Month;
-        """)
-        result = db.session.execute(query)
-        rows = [dict(row._mapping) for row in result]
-        return jsonify({"status": "success", "data": rows})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
-
-# Cases completed/initiated by year
 @app.route('/cases/year', methods=['GET'])
 def cases_by_year():
     try:
@@ -724,93 +668,6 @@ def report_summary_daily():
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
-
-
-# Alerts processed/pending by week
-@app.route('/reports/week', methods=['GET'])
-def reports_by_week():
-    try:
-        from sqlalchemy import text
-        query = text("""
-            SELECT
-                WEEK(Date, 1) AS Week,
-                CASE WHEN Status = 1 THEN 'Finished' ELSE 'Unfinished' END AS Report_Status,
-                COUNT(*) AS Total_Reports
-            FROM report
-            GROUP BY WEEK(Date, 1), Status
-            ORDER BY Week;
-        """)
-        result = db.session.execute(query)
-        rows = [dict(row._mapping) for row in result]
-        return jsonify({"status": "success", "data": rows})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
-
-# Alerts processed/pending by month
-@app.route('/reports/month', methods=['GET'])
-def reports_by_month():
-    try:
-        from sqlalchemy import text
-        query = text("""
-            SELECT
-                MONTH(Date) AS Month,
-                CASE WHEN Status = 1 THEN 'Finished' ELSE 'Unfinished' END AS Report_Status,
-                COUNT(*) AS Total_Reports
-            FROM report
-            GROUP BY MONTH(Date), Status
-            ORDER BY Month;
-        """)
-        result = db.session.execute(query)
-        rows = [dict(row._mapping) for row in result]
-        return jsonify({"status": "success", "data": rows})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
-
-# Alerts processed/pending by year
-@app.route('/reports/year', methods=['GET'])
-def reports_by_year():
-    try:
-        from sqlalchemy import text
-        query = text("""
-            SELECT
-                YEAR(Date) AS Year,
-                CASE WHEN Status = 1 THEN 'Finished' ELSE 'Unfinished' END AS Report_Status,
-                COUNT(*) AS Total_Reports
-            FROM report
-            GROUP BY YEAR(Date), Status
-            ORDER BY Year;
-        """)
-        result = db.session.execute(query)
-        rows = [dict(row._mapping) for row in result]
-        return jsonify({"status": "success", "data": rows})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
-
-@app.route('/update-remark', methods=['POST'])
-def update_remark():
-    try:
-        data = request.get_json()
-        date = data.get("Date")
-        train_name = data.get("Train_Name")
-        new_remark = data.get("Remarks")
-
-        if not (date and train_name):
-            return jsonify({"status": "error", "message": "Missing date or train name"}), 400
-
-        # Update using SQLAlchemy ORM
-        report = FinalReport.query.filter_by(Date=date, Train_Name=train_name).first()
-        if report:
-            report.Report_Remark = new_remark
-            report.Date = date
-            report.Train_Name = train_name
-            db.session.commit()
-            return jsonify({"status": "success", "message": "Remark updated"})
-        else:
-            return jsonify({"status": "error", "message": "Report not found"}), 404
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"status": "error", "message": str(e)})
-
 
 @app.route('/pending')
 def get_pending():

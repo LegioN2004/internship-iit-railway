@@ -13,7 +13,7 @@ function dateTime() {
 // Fetch trains data from the Flask backend with authentication
 JWT_AUTH.fetchWithAuth("http://127.0.0.1:5000/trains")
   .then((res) => res.json())
-  .then((data) => {
+  .then((data=> {
     // Set station name in the card header if available
     if (data.station_name) {
       const stationNameHeader = document.querySelector(".card-title.mb-0");
@@ -30,6 +30,8 @@ JWT_AUTH.fetchWithAuth("http://127.0.0.1:5000/trains")
       item.status,
       item.report_id, // Include report_id as the 5th column
     ]);
+    console.log("Fetched trains tableData:", tableData);
+
 
     new gridjs.Grid({
       columns: [
@@ -235,7 +237,7 @@ JWT_AUTH.fetchWithAuth("http://127.0.0.1:5000/trains")
           alert("Network error. Please try again.");
         });
     };
-  });
+  }));
 
 // In train-report.html
 const urlParams = new URLSearchParams(window.location.search);

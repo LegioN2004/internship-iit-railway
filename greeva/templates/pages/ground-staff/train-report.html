@@ -2,7 +2,10 @@
 
 {% load static i18n %}
 
-{% block title %}Ground Staff Report - {{ train_name }}{% endblock title %}
+{% include 'partials/topbar-ground-staff.html' %}
+{% include 'partials/sidenav-ground-staff.html' %}
+
+{% block title %}Train Report - {{ train_name }}{% endblock title %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static '/vendor/gridjs/theme/mermaid.min.css' %}">
@@ -133,9 +136,6 @@
     }
 </style>
 {% endblock extra_css %}
-
-{% block page_title %}
-{% endblock page_title %}
 
 {% block page_content %}
 
