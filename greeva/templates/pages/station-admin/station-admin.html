@@ -179,11 +179,45 @@
   let grid = new gridjs.Grid({
     columns: [
       { name: 'Date', width: '100px', formatter: cell => gridjs.html('<span class="fw-semibold">' + cell + '</span>') },
-      { name: 'Status', width: '180px' },
+      {
+        name: 'Train Status',
+        width: '180px',
+        formatter: (cell, row) => {
+          // Use row.cells[5].data for reportId (hidden column)
+          const reportId = row.cells[5] && row.cells[5].data ? row.cells[5].data : null;
+          const status = cell; // "Finished" or "Unfinished"
+          const bgColor = status === "Finished" ? "#28a745" : "#dc3545";
+          const hoverColor = status === "Finished" ? "#218838" : "#c82333";
+
+          // Match ground-staff style: always link to train-report page using report_id
+          return gridjs.html(
+            `<a href="/train-report?id=${encodeURIComponent(reportId)}"
+               style="background-color: ${bgColor};
+                      color: white;
+                      padding: 8px 16px;
+                      border-radius: 6px;
+                      text-decoration: none;
+                      font-weight: 500;
+                      display: inline-block;
+                      transition: all 0.3s ease;
+                      box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+               onmouseover="this.style.backgroundColor='${hoverColor}';
+                            this.style.transform='translateY(-2px)';
+                            this.style.boxShadow='0 4px 8px rgba(0,0,0,0.2)';"
+               onmouseout="this.style.backgroundColor='${bgColor}';
+                           this.style.transform='translateY(0px)';
+                           this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)';">
+              ${status}
+            </a>`
+          );
+        },
+        sort: true,
+      },
       { name: 'Train Name', width: '200px', formatter: cell => gridjs.html(`<a href="">${cell}</a>`) },
       { name: 'Time', width: '130px' },
       { name: 'Remarks', width: '180px', formatter: cell => gridjs.html(`<span style="cursor: pointer;" onclick="handleRemarksInput(this)">${cell || '<i>Click to add</i>'}</span>`) },
-      { name: 'Generate a case', width: '150px', formatter: () => gridjs.html('<input type="checkbox" />') }
+      { name: 'Generate a case', width: '150px', formatter: () => gridjs.html('<input type="checkbox" />') },
+      { id: 'report_id', name: 'Report ID', hidden: true },
     ],
     pagination: { limit: 5 },
     sort: true,
@@ -193,7 +227,7 @@
 
   // Load data from backend and update table
   function loadTrainReportTable() {
-    fetch("http://127.0.0.1:5000/train-report/week")
+    fetch("http://13.60.252.71:5000/train-report/week")
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -208,16 +242,17 @@
             row.Train_Name || "-",
             row.Time || "-",
             row.Remarks || "<i>Click to add</i>",
-            "" // checkbox placeholder
+            "", // checkbox placeholder
+            row.Report_ID || row.report_id || row.id || "" // hidden report_id column for linking
           ]);
           grid.updateConfig({ data: formattedData }).forceRender();
         } else {
-          grid.updateConfig({ data: [["No data", "", "", "", "", ""]] }).forceRender();
+          grid.updateConfig({ data: [["No data", "", "", "", "", "", ""]] }).forceRender();
         }
       })
       .catch(error => {
         console.error("Fetch error:", error);
-        grid.updateConfig({ data: [["Error loading data", "", "", "", "", ""]] }).forceRender();
+        grid.updateConfig({ data: [["Error loading data", "", "", "", "", "", ""]] }).forceRender();
       });
   }
 
@@ -256,39 +291,39 @@
     // 🌐 Choose the correct Flask endpoint
     if (cardType === 'finished') {
       if (period === 'This week') {
-        url = 'http://127.0.0.1:5000/report-summary/weekly';
+        url = 'http://13.60.252.71:5000/report-summary/weekly';
         field = 'Week';
       } else if (period === 'This month') {
-        url = 'http://127.0.0.1:5000/report-summary/monthly';
+        url = 'http://13.60.252.71:5000/report-summary/monthly';
         field = 'Month';
       } else {
-        url = 'http://127.0.0.1:5000/report-summary/yearly';
+        url = 'http://13.60.252.71:5000/report-summary/yearly';
         field = 'Year';
       }
     }
 
     if (cardType === 'alerts') {
       if (period === 'This week') {
-        url = 'http://127.0.0.1:5000/reports/week';
+        url = 'http://13.60.252.71:5000/reports/week';
         field = 'Week';
       } else if (period === 'This month') {
-        url = 'http://127.0.0.1:5000/reports/month';
+        url = 'http://13.60.252.71:5000/reports/month';
         field = 'Month';
       } else {
-        url = 'http://127.0.0.1:5000/reports/year';
+        url = 'http://13.60.252.71:5000/reports/year';
         field = 'Year';
       }
     }
 
     if (cardType === 'cases') {
       if (period === 'This week') {
-        url = 'http://127.0.0.1:5000/cases/week';
+        url = 'http://13.60.252.71:5000/cases/week';
         field = 'Week';
       } else if (period === 'This month') {
-        url = 'http://127.0.0.1:5000/cases/month';
+        url = 'http://13.60.252.71:5000/cases/month';
         field = 'Month';
       } else {
-        url = 'http://127.0.0.1:5000/cases/year';
+        url = 'http://13.60.252.71:5000/cases/year';
         field = 'Year';
       }
     }
@@ -380,5 +415,23 @@
       window.location.href = "{% url 'pages:dynamic_pages' template_name='auth-login' %}";
     }
   });
+</script>
+
+
+<script>
+  // In train-report.html
+  const urlParams = new URLSearchParams(window.location.search);
+  const trainId = urlParams.get("id");
+  if (trainId) {
+    fetch(`http://13.60.252.71:5000/train-report?id=${trainId}`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("authToken"),
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // Fill your table with data, leaving cells blank if data[field] is empty
+      });
+  }
 </script>
 {% endblock extra_javascript %}

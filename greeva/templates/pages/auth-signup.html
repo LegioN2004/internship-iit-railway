@@ -309,7 +309,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         // Dynamically populate stations
         const stationSelect = document.getElementById("station-name");
-        fetch("http://127.0.0.1:5000/stations")
+        fetch("http://13.60.252.71:5000/stations")
             .then(res => res.json())
             .then(data => {
                 if (data.status === "success" && Array.isArray(data.stations)) {
@@ -488,7 +488,7 @@
             };
 
             try {
-                const response = await fetch("http://127.0.0.1:5000/signup", {
+                const response = await fetch("http://13.60.252.71:5000/signup", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

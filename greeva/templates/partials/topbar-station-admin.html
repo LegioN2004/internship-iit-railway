@@ -353,7 +353,7 @@
 
                                 // If not in JWT, fetch from /profile
                                 if (!user) {
-                                    fetch('http://127.0.0.1:5000/profile', {
+                                    fetch('http://13.60.252.71:5000/profile', {
                                         headers: {
                                             'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
                                             'Content-Type': 'application/json'
@@ -444,7 +444,7 @@
 
         // If not in JWT, fetch from /profile
         if (!user) {
-            JWT_AUTH.fetchWithAuth('http://127.0.0.1:5000/profile')
+            JWT_AUTH.fetchWithAuth('http://13.60.252.71:5000/profile')
                 .then(res => res.json())
                 .then(data => {
                     if (data && data.user) setTopbarUserInfo(data.user);
