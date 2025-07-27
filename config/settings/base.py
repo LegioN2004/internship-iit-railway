@@ -50,8 +50,18 @@ LOCALE_PATHS = [str(BASE_DIR / "locale")]
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / "db.sqlite3",
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'train2',
+        'USER': 'root',
+        'PASSWORD': 'root',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'train2',
+        # 'USER': 'root2',
+        # 'PASSWORD': 'root#123',
+        # 'HOST': 'localhost',
+        # 'PORT': '3306',
     }
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
@@ -85,6 +95,8 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     "allauth.mfa",
     "allauth.socialaccount",
+    "rest_framework",
+    "api",
 ]
 
 LOCAL_APPS = [

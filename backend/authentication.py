@@ -13,8 +13,8 @@ import re
 app = Flask(__name__)
 CORS(app)
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost/train2'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root2:root#123@localhost/train2'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost/train2'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root2:root#123@localhost/train2'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'greeva-train-jwt-secret-key-2024-production-secure-12345'  # Strong secret key for JWT
 

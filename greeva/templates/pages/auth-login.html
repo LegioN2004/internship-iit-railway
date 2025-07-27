@@ -260,7 +260,7 @@
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Logging in...';
             submitBtn.disabled = true;
 
-            fetch("http://13.60.252.71:5000/login", {
+            fetch("http://127.0.0.1:5000/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ Ph_No: phone, Password: password }),

@@ -8,7 +8,7 @@ from django.views import defaults as default_views
 from django.views.generic import TemplateView
 
 urlpatterns = [
-    
+
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
@@ -16,6 +16,7 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
     path("", include("greeva.pages.urls", namespace="pages")),
+    # path("api/", include("api.urls", namespace="api")),
 
     # ...
     # Media files

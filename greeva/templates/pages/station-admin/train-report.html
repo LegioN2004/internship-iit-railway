@@ -225,7 +225,7 @@
 
         if (reportId) {
             // Fetch data from Flask API using report ID
-            fetch(`http://13.60.252.71:5000/train-report?id=${encodeURIComponent(reportId)}`, {
+            fetch(`http://127.0.0.1:5000/train-report?id=${encodeURIComponent(reportId)}`, {
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("authToken")
                 }
@@ -243,7 +243,7 @@
                 });
         } else {
             // If no ID, fetch first available report
-            fetch(`http://13.60.252.71:5000/train-report`, {
+            fetch(`http://127.0.0.1:5000/train-report`, {
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("authToken")
                 }

@@ -218,7 +218,7 @@
       const date = row.cells[0].innerText; // Assuming Date is in the first column
       const trainName = row.cells[2].innerText; // Assuming Train Name is in the third column
 
-      fetch('http://13.60.252.71:5001/update-remark', {
+      fetch('http://127.0.0.1:5001/update-remark', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -253,7 +253,7 @@
   let trainReportGrid; // Declare a global variable to hold the Grid.js instance
 
   function fetchAndRenderTrainReport(period = 'week') {
-    const apiUrl = `http://13.60.252.71:5001/train-report/${period}`;
+    const apiUrl = `http://127.0.0.1:5001/train-report/${period}`;
 
     fetch(apiUrl)
       .then(response => {
@@ -375,14 +375,14 @@
 
     switch (cardType) {
       case 'finished':
-        apiUrl = `http://13.60.252.71:5001/report-summary/${period.toLowerCase().replace('this ', '')}`;
+        apiUrl = `http://127.0.0.1:5001/report-summary/${period.toLowerCase().replace('this ', '')}`;
         countElementId = 'finished-count';
         percentElementId = 'finished-percent'; // This card only shows finished count
         periodTextElementId = 'finished-period';
         dropdownId = 'dropdownFinished';
         break;
       case 'alerts':
-        apiUrl = 'http://13.60.252.71:5001/report-summary/daily'; // This endpoint gives processed and pending
+        apiUrl = 'http://127.0.0.1:5001/report-summary/daily'; // This endpoint gives processed and pending
         countElementId = 'alerts-count-display';
         percentElementId = 'alerts-percent';
         periodTextElementId = 'alerts-period';
@@ -393,7 +393,7 @@
         // You might need to add a new endpoint in Merged.py for this.
         // For now, we'll keep the static data for 'cases' or use 'report-summary/daily' as a placeholder if applicable.
         // Assuming 'cases' is similar to 'alerts' for demonstration, using daily summary
-        apiUrl = 'http://13.60.252.71:5001/report-summary/daily';
+        apiUrl = 'http://127.0.0.1:5001/report-summary/daily';
         countElementId = 'cases-count';
         percentElementId = 'cases-percent';
         periodTextElementId = 'cases-period';
@@ -555,7 +555,7 @@
   // Update notification count based on alerts pending
   function updateNotificationCount() {
     // Fetch pending alerts from your backend
-    fetch('http://13.60.252.71:5001/pending') // This endpoint provides 'reports' with id, status, train
+    fetch('http://127.0.0.1:5001/pending') // This endpoint provides 'reports' with id, status, train
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -630,7 +630,7 @@
     const stationSelect = document.getElementById('station-select');
 
     // **CHANGED: Use the new /api/station-dropdown endpoint**
-    fetch('http://13.60.252.71:5001/api/station-dropdown')
+    fetch('http://127.0.0.1:5001/api/station-dropdown')
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

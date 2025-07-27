@@ -15,7 +15,7 @@ function initMap() {
 async function fetchStationsAndAddMarkers(map) {
   try {
     // **FIX: Update the URL to match the new route in app.py**
-    const response = await fetch("http://13.60.252.71:5001/api/stations");
+    const response = await fetch("http://127.0.0.1:5001/api/stations");
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

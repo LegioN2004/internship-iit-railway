@@ -227,7 +227,7 @@
 
   // Load data from backend and update table
   function loadTrainReportTable() {
-    fetch("http://13.60.252.71:5000/train-report/week")
+    fetch("http://127.0.0.1:5000/train-report/week")
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -291,39 +291,39 @@
     // 🌐 Choose the correct Flask endpoint
     if (cardType === 'finished') {
       if (period === 'This week') {
-        url = 'http://13.60.252.71:5000/report-summary/weekly';
+        url = 'http://127.0.0.1:5000/report-summary/weekly';
         field = 'Week';
       } else if (period === 'This month') {
-        url = 'http://13.60.252.71:5000/report-summary/monthly';
+        url = 'http://127.0.0.1:5000/report-summary/monthly';
         field = 'Month';
       } else {
-        url = 'http://13.60.252.71:5000/report-summary/yearly';
+        url = 'http://127.0.0.1:5000/report-summary/yearly';
         field = 'Year';
       }
     }
 
     if (cardType === 'alerts') {
       if (period === 'This week') {
-        url = 'http://13.60.252.71:5000/reports/week';
+        url = 'http://127.0.0.1:5000/reports/week';
         field = 'Week';
       } else if (period === 'This month') {
-        url = 'http://13.60.252.71:5000/reports/month';
+        url = 'http://127.0.0.1:5000/reports/month';
         field = 'Month';
       } else {
-        url = 'http://13.60.252.71:5000/reports/year';
+        url = 'http://127.0.0.1:5000/reports/year';
         field = 'Year';
       }
     }
 
     if (cardType === 'cases') {
       if (period === 'This week') {
-        url = 'http://13.60.252.71:5000/cases/week';
+        url = 'http://127.0.0.1:5000/cases/week';
         field = 'Week';
       } else if (period === 'This month') {
-        url = 'http://13.60.252.71:5000/cases/month';
+        url = 'http://127.0.0.1:5000/cases/month';
         field = 'Month';
       } else {
-        url = 'http://13.60.252.71:5000/cases/year';
+        url = 'http://127.0.0.1:5000/cases/year';
         field = 'Year';
       }
     }
@@ -423,7 +423,7 @@
   const urlParams = new URLSearchParams(window.location.search);
   const trainId = urlParams.get("id");
   if (trainId) {
-    fetch(`http://13.60.252.71:5000/train-report?id=${trainId}`, {
+    fetch(`http://127.0.0.1:5000/train-report?id=${trainId}`, {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("authToken"),
       },

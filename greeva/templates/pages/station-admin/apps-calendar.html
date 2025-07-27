@@ -280,7 +280,7 @@
 
             // --- DATA FETCHING ---
             events: function (fetchInfo, successCallback, failureCallback) {
-                const apiUrl = 'http://13.60.252.71:5000/report-summary/daily';
+                const apiUrl = 'http://127.0.0.1:5000/report-summary/daily';
                 fetch(apiUrl)
                     .then(response => {
                         if (!response.ok) throw new Error(`Network error: ${response.statusText}`);
