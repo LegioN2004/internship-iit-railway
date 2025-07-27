@@ -49,21 +49,26 @@ LOCALE_PATHS = [str(BASE_DIR / "locale")]
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'train2',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        # 'ENGINE': 'django.db.backends.mysql',
-        # 'NAME': 'train2',
-        # 'USER': 'root2',
-        # 'PASSWORD': 'root#123',
-        # 'HOST': 'localhost',
-        # 'PORT': '3306',
+    "default": {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / "db.sqlite3",
     }
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'train2',
+#         'USER': 'root',
+#         'PASSWORD': 'root',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#         # 'ENGINE': 'django.db.backends.mysql',
+#         # 'NAME': 'train2',
+#         # 'USER': 'root2',
+#         # 'PASSWORD': 'root#123',
+#         # 'HOST': 'localhost',
+#         # 'PORT': '3306',
+#     }
 }
+
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DEFAULT_AUTO_FIELD
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
